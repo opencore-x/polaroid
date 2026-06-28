@@ -1,3 +1,4 @@
+import { DATE_FORMATS, type DateFormat } from '@/lib/date'
 import { cn } from '@/lib/utils'
 import { usePhotoStore } from '@/stores/photo-store'
 import {
@@ -10,13 +11,23 @@ export function CaptionControls() {
   const setCaptionLocation = useSettingsStore(
     (state) => state.setCaptionLocation,
   )
+  const dateFormat = useSettingsStore((state) => state.dateFormat)
+  const setDateFormat = useSettingsStore((state) => state.setDateFormat)
+  const showCameraLine = useSettingsStore((state) => state.showCameraLine)
+  const setShowCameraLine = useSettingsStore((state) => state.setShowCameraLine)
   const showCaptions = useSettingsStore((state) => state.showCaptions)
   const setShowCaptions = useSettingsStore((state) => state.setShowCaptions)
   const applyLocationMode = usePhotoStore((state) => state.applyLocationMode)
+  const applyDateFormat = usePhotoStore((state) => state.applyDateFormat)
 
   const selectLocation = (location: CaptionLocation) => {
     setCaptionLocation(location)
     applyLocationMode(location)
+  }
+
+  const selectDateFormat = (format: DateFormat) => {
+    setDateFormat(format)
+    applyDateFormat(format)
   }
 
   return (
@@ -43,6 +54,35 @@ export function CaptionControls() {
           ))}
         </div>
       </div>
+      <div className="flex items-center gap-1.5">
+        <label
+          htmlFor="date-format"
+          className="text-muted-foreground text-xs font-medium"
+        >
+          Date
+        </label>
+        <select
+          id="date-format"
+          value={dateFormat}
+          onChange={(event) => selectDateFormat(event.target.value as DateFormat)}
+          className="border-input bg-background rounded-md border px-2 py-1 text-xs"
+        >
+          {DATE_FORMATS.map((format) => (
+            <option key={format.id} value={format.id}>
+              {format.label}
+            </option>
+          ))}
+        </select>
+      </div>
+      <label className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium">
+        <input
+          type="checkbox"
+          checked={showCameraLine}
+          onChange={(event) => setShowCameraLine(event.target.checked)}
+          className="accent-primary"
+        />
+        Camera info
+      </label>
       <label className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium">
         <input
           type="checkbox"
