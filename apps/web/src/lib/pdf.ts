@@ -1,6 +1,6 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
 
-import { type Crop, cropSource } from '@/lib/crop'
+import { type Crop, cropSource, windowBox } from '@/lib/crop'
 import {
   type PaperSize,
   POLAROID,
@@ -22,25 +22,31 @@ function loadImage(url: string): Promise<HTMLImageElement | null> {
 }
 
 /**
- * Draws the cropped square of the photo onto a canvas and returns sRGB JPEG
- * bytes. The sampled region comes from `cropSource`, so it matches the on-screen
- * framing exactly. Canvas output is always sRGB — what photo labs and home
- * inkjets want (see README). Handles any format the browser can decode.
+ * Draws the cropped photo onto a canvas of the window's pixel size and returns
+ * sRGB JPEG bytes. The sampled region comes from `cropSource`, so it matches the
+ * on-screen framing exactly. Canvas output is always sRGB — what photo labs and
+ * home inkjets want (see README). Handles any format the browser can decode.
  */
-async function rasterizeSquareJpeg(
+async function rasterizeJpeg(
   url: string,
-  sizePx: number,
+  outW: number,
+  outH: number,
   crop: Crop,
 ): Promise<Uint8Array | null> {
   const img = await loadImage(url)
   if (!img) return null
   const canvas = document.createElement('canvas')
-  canvas.width = sizePx
-  canvas.height = sizePx
+  canvas.width = outW
+  canvas.height = outH
   const ctx = canvas.getContext('2d')
   if (!ctx) return null
-  const { sx, sy, side } = cropSource(img.naturalWidth, img.naturalHeight, crop)
-  ctx.drawImage(img, sx, sy, side, side, 0, 0, sizePx, sizePx)
+  const { sx, sy, sw, sh } = cropSource(
+    img.naturalWidth,
+    img.naturalHeight,
+    crop,
+    outW / outH,
+  )
+  ctx.drawImage(img, sx, sy, sw, sh, 0, 0, outW, outH)
   const blob = await new Promise<Blob | null>((resolve) =>
     canvas.toBlob(resolve, 'image/jpeg', 0.92),
   )
@@ -108,15 +114,23 @@ export async function buildSheetPdf(
         borderWidth: 0.5,
       })
 
-      const imgPx = Math.round((imgSize / PT_PER_MM) * (IMAGE_DPI / 25.4))
-      const jpeg = await rasterizeSquareJpeg(photo.url, imgPx, photo.crop)
+      // The photo sits in an orientation window centred in the square image
+      // area; the surrounding letterbox stays the white frame colour.
+      const win = windowBox(imgSize, photo.orientation)
+      const toPx = (pt: number) => Math.round((pt / PT_PER_MM) * (IMAGE_DPI / 25.4))
+      const jpeg = await rasterizeJpeg(
+        photo.url,
+        toPx(win.width),
+        toPx(win.height),
+        photo.crop,
+      )
       if (jpeg) {
         const embedded = await doc.embedJpg(jpeg)
         page.drawImage(embedded, {
-          x: x + pad,
-          y: pageH - yTop - pad - imgSize,
-          width: imgSize,
-          height: imgSize,
+          x: x + pad + win.left,
+          y: pageH - yTop - pad - win.top - win.height,
+          width: win.width,
+          height: win.height,
         })
       }
 
