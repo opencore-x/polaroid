@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { DATE_FORMATS, type DateFormat } from '@/lib/date'
 import { CAPTION_FONTS } from '@/lib/fonts'
 import { LOCATION_DETAILS } from '@/lib/geocode'
-import { PAPER_SIZES, paperSize } from '@/lib/layout'
+import { FRAME_SHAPES, PAPER_SIZES, paperSize } from '@/lib/layout'
 import { downloadSheetPdf } from '@/lib/pdf'
 import { usePhotoStore } from '@/stores/photo-store'
 import {
@@ -36,6 +36,8 @@ export function OptionsPanel() {
   const setShowCaptions = useSettingsStore((state) => state.setShowCaptions)
   const paperSizeId = useSettingsStore((state) => state.paperSizeId)
   const setPaperSize = useSettingsStore((state) => state.setPaperSize)
+  const frameShape = useSettingsStore((state) => state.frameShape)
+  const setFrameShape = useSettingsStore((state) => state.setFrameShape)
   const perRow = useSettingsStore((state) => state.polaroidsPerRow)
   const setPerRow = useSettingsStore((state) => state.setPolaroidsPerRow)
   const showCutMarks = useSettingsStore((state) => state.showCutMarks)
@@ -63,6 +65,7 @@ export function OptionsPanel() {
         showCaptions,
         showCameraLine,
         paper,
+        frameShape,
         captionFontId,
       )
     } finally {
@@ -129,6 +132,22 @@ export function OptionsPanel() {
       </Section>
 
       <Section title="Sheet">
+        <Field label="Frame" htmlFor="opt-shape">
+          <select
+            id="opt-shape"
+            className={SELECT_CLASS}
+            value={frameShape}
+            onChange={(event) =>
+              setFrameShape(event.target.value as typeof frameShape)
+            }
+          >
+            {FRAME_SHAPES.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </Field>
         <Field label="Paper" htmlFor="opt-paper">
           <select
             id="opt-paper"
