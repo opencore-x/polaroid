@@ -43,7 +43,8 @@ export function SheetPolaroid({
   const pad = width * borderWidth
   const aspect = orientationAspect(shape)
   const imageH = (width - pad * 2) / aspect
-  const ink = captionColors(borderColor)
+  const frameColor = photo.borderColor ?? borderColor
+  const ink = captionColors(frameColor)
   const editing = editable && selected
 
   return (
@@ -59,7 +60,7 @@ export function SheetPolaroid({
         height: width * cardAspect(shape, borderWidth),
         padding: pad,
         paddingBottom: 0,
-        backgroundColor: borderColor,
+        backgroundColor: frameColor,
         outlineOffset: 2,
       }}
       onClick={

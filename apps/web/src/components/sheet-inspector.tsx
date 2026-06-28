@@ -1,6 +1,8 @@
-import { Check, Trash2 } from 'lucide-react'
+import { Check, RotateCcw, Trash2 } from 'lucide-react'
 
 import { MAX_CROP_SCALE, MIN_CROP_SCALE } from '@/lib/crop'
+import { BORDER_COLORS } from '@/lib/layout'
+import { cn } from '@/lib/utils'
 import { useEditorStore } from '@/stores/editor-store'
 import { usePhotoStore } from '@/stores/photo-store'
 
@@ -12,16 +14,14 @@ export function SheetInspector() {
     state.photos.find((item) => item.id === selectedId),
   )
   const setCrop = usePhotoStore((state) => state.setCrop)
+  const setPhotoBorder = usePhotoStore((state) => state.setPhotoBorder)
   const remove = usePhotoStore((state) => state.remove)
 
   if (!photo) return null
 
   return (
-    <div className="border-input bg-card pointer-events-auto flex items-center gap-x-4 rounded-full border py-1.5 pr-1.5 pl-3 shadow-lg">
-      <span className="text-muted-foreground hidden text-xs font-medium sm:inline">
-        Drag to reposition
-      </span>
-      <div className="flex items-center gap-2">
+    <div className="border-input bg-card pointer-events-auto flex items-center gap-x-3 rounded-full border py-1.5 pr-1.5 pl-3 shadow-lg">
+      <div className="hidden items-center gap-2 sm:flex">
         <span className="text-muted-foreground text-xs font-medium">Zoom</span>
         <input
           type="range"
@@ -36,9 +36,40 @@ export function SheetInspector() {
               scale: Number(event.target.value),
             })
           }
-          className="accent-primary w-28"
+          className="accent-primary w-24"
         />
       </div>
+      <span className="bg-border hidden h-5 w-px sm:block" />
+      <div className="flex items-center gap-1">
+        {BORDER_COLORS.map((swatch) => (
+          <button
+            key={swatch.hex}
+            type="button"
+            aria-label={`${swatch.label} border`}
+            aria-pressed={photo.borderColor === swatch.hex}
+            onClick={() => setPhotoBorder(photo.id, swatch.hex)}
+            className={cn(
+              'size-5 rounded-full border border-black/10',
+              photo.borderColor === swatch.hex &&
+                'ring-primary ring-2 ring-offset-1',
+            )}
+            style={{ backgroundColor: swatch.hex }}
+          />
+        ))}
+        <button
+          type="button"
+          aria-label="Use the sheet border colour"
+          aria-pressed={!photo.borderColor}
+          onClick={() => setPhotoBorder(photo.id, undefined)}
+          className={cn(
+            'text-muted-foreground flex size-5 items-center justify-center rounded-full border border-black/10',
+            !photo.borderColor && 'ring-primary ring-2 ring-offset-1',
+          )}
+        >
+          <RotateCcw className="size-2.5" />
+        </button>
+      </div>
+      <span className="bg-border h-5 w-px" />
       <button
         type="button"
         aria-label="Remove photo"
@@ -46,7 +77,7 @@ export function SheetInspector() {
           select(null)
           remove(photo.id)
         }}
-        className="text-muted-foreground hover:text-destructive ml-auto flex size-7 items-center justify-center rounded hover:bg-neutral-100"
+        className="text-muted-foreground hover:text-destructive flex size-7 items-center justify-center rounded hover:bg-neutral-100"
       >
         <Trash2 className="size-4" />
       </button>
