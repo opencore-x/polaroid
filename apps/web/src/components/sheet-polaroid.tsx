@@ -12,11 +12,13 @@ export function SheetPolaroid({
   width,
   fontStack,
   showCaptions,
+  showCameraLine,
 }: {
   photo: Photo
   width: number
   fontStack: string
   showCaptions: boolean
+  showCameraLine: boolean
 }) {
   const pad = width * POLAROID.framePad
   const imageSize = width - pad * 2
@@ -73,6 +75,18 @@ export function SheetPolaroid({
             >
               {photo.captionBottom}
             </span>
+            {showCameraLine && photo.cameraLine && (
+              <span
+                className="max-w-full truncate"
+                style={{
+                  fontSize: width * 0.045,
+                  lineHeight: 1.2,
+                  color: '#a3a3a3',
+                }}
+              >
+                {photo.cameraLine}
+              </span>
+            )}
           </>
         )}
       </div>

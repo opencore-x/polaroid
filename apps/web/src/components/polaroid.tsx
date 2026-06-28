@@ -28,6 +28,7 @@ export function Polaroid({ photo }: { photo: Photo }) {
   const framePadding = useSettingsStore((state) => state.framePadding)
   const captionFontId = useSettingsStore((state) => state.captionFontId)
   const showCaptions = useSettingsStore((state) => state.showCaptions)
+  const showCameraLine = useSettingsStore((state) => state.showCameraLine)
   const fontFamily = captionFontStack(captionFontId)
 
   return (
@@ -109,6 +110,14 @@ export function Polaroid({ photo }: { photo: Photo }) {
               fontFamily={fontFamily}
               className="text-sm text-neutral-500"
             />
+            {showCameraLine && photo.cameraLine && (
+              <span
+                className="mt-0.5 max-w-full truncate text-[10px] text-neutral-400"
+                style={{ fontFamily }}
+              >
+                {photo.cameraLine}
+              </span>
+            )}
           </>
         )}
       </div>
