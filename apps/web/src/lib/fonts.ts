@@ -6,7 +6,7 @@ export interface CaptionFont {
 }
 
 export const CAPTION_FONTS: CaptionFont[] = [
-  { id: 'caveat', label: 'Caveat', stack: '"Caveat", cursive' },
+  { id: 'indie-flower', label: 'Indie Flower', stack: '"Indie Flower", cursive' },
   { id: 'patrick-hand', label: 'Patrick Hand', stack: '"Patrick Hand", cursive' },
   {
     id: 'shadows-into-light',
