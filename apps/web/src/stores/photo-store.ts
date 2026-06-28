@@ -15,6 +15,8 @@ interface PhotoState {
   /** Adds image files to the collection. Returns how many were accepted. */
   addFiles: (files: File[]) => number
   setCaption: (id: string, field: CaptionField, value: string) => void
+  /** Moves the photo with `activeId` to the position of `overId`. */
+  reorder: (activeId: string, overId: string) => void
   remove: (id: string) => void
   clear: () => void
 }
@@ -60,6 +62,16 @@ export const usePhotoStore = create<PhotoState>((set) => {
           photo.id === id ? { ...photo, [field]: value } : photo,
         ),
       })),
+    reorder: (activeId, overId) =>
+      set((state) => {
+        const from = state.photos.findIndex((p) => p.id === activeId)
+        const to = state.photos.findIndex((p) => p.id === overId)
+        if (from === -1 || to === -1 || from === to) return state
+        const photos = state.photos.slice()
+        const [moved] = photos.splice(from, 1)
+        photos.splice(to, 0, moved)
+        return { photos }
+      }),
     remove: (id) =>
       set((state) => {
         const target = state.photos.find((photo) => photo.id === id)
