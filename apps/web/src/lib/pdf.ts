@@ -8,6 +8,7 @@ import {
   cropMarks,
   sheetLayout,
 } from '@/lib/layout'
+import { embedCaptionFont } from '@/lib/pdf-fonts'
 import { type Photo } from '@/lib/photos'
 
 const IMAGE_DPI = 300
@@ -62,9 +63,14 @@ export async function buildSheetPdf(
   showCaptions: boolean,
   showCameraLine: boolean,
   paper: PaperSize,
+  captionFontId: string,
 ): Promise<Uint8Array> {
   const doc = await PDFDocument.create()
-  const font = await doc.embedFont(StandardFonts.Helvetica)
+  // Embed the selected handwriting font so the PDF matches the preview; fall
+  // back to Helvetica if it can't be loaded.
+  const font =
+    (await embedCaptionFont(doc, captionFontId)) ??
+    (await doc.embedFont(StandardFonts.Helvetica))
   const layout = sheetLayout(perRow, paper)
   const pageW = paper.widthMm * PT_PER_MM
   const pageH = paper.heightMm * PT_PER_MM
@@ -191,6 +197,7 @@ export async function downloadSheetPdf(
   showCaptions: boolean,
   showCameraLine: boolean,
   paper: PaperSize,
+  captionFontId: string,
   filename = 'polaroids.pdf',
 ): Promise<void> {
   const bytes = await buildSheetPdf(
@@ -200,6 +207,7 @@ export async function downloadSheetPdf(
     showCaptions,
     showCameraLine,
     paper,
+    captionFontId,
   )
   const blob = new Blob([bytes as BlobPart], { type: 'application/pdf' })
   const url = URL.createObjectURL(blob)

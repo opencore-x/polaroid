@@ -34,6 +34,7 @@ export function A4Preview() {
         showCaptions,
         showCameraLine,
         paper,
+        captionFontId,
       )
     } finally {
       setIsExporting(false)
