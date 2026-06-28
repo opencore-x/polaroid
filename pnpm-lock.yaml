@@ -17,6 +17,18 @@ importers:
 
   apps/web:
     dependencies:
+      '@fontsource/caveat':
+        specifier: ^5.2.8
+        version: 5.2.8
+      '@fontsource/kalam':
+        specifier: ^5.2.8
+        version: 5.2.8
+      '@fontsource/patrick-hand':
+        specifier: ^5.2.8
+        version: 5.2.8
+      '@fontsource/shadows-into-light':
+        specifier: ^5.2.8
+        version: 5.2.8
       '@radix-ui/react-slot':
         specifier: ^1.3.0
         version: 1.3.0(@types/react@19.2.17)(react@19.2.7)
@@ -156,6 +168,18 @@ packages:
 
   '@emnapi/wasi-threads@1.2.2':
     resolution: {integrity: sha512-c95qOXkHdydNKhscBTebqEC1CVAZpyqOfVfBzQ1qgzyl3gfeldUjIggDbIZgDKsHLgnsM+igH7TJ/eAasaVuMA==}
+
+  '@fontsource/caveat@5.2.8':
+    resolution: {integrity: sha512-9fUUfFE2IQFKbx+xOcaeQxxmh8iJguEb8z+j1PeueO4UUx+XfT4pRm/B04ZDvFA794/iRxY/IibmP8ZKtIf4rw==}
+
+  '@fontsource/kalam@5.2.8':
+    resolution: {integrity: sha512-9WDYPX1llS28xRjrqAoz3IOLeaBhCtL3HCtNanYnF1fthFPmSD5aESL6s7C1SJxAlxq/qzTlpIpw4S1W9+q3OA==}
+
+  '@fontsource/patrick-hand@5.2.8':
+    resolution: {integrity: sha512-FZx34VLuiF+Pjv/A/m1bTxjR6hAvmL6vdCp62uypVdgFvSrPrBOxX+vCXVy8lfNVFqvKfm/ghun+aaYVYqfBEg==}
+
+  '@fontsource/shadows-into-light@5.2.8':
+    resolution: {integrity: sha512-ZTiWDiLQmG8kjWEb2o3vicAqpEi02/SziTClaSXRRKpdpXv5w/Jv3kG7EVK9d7wlFm3/4U3hhaFOcIuHznmbSQ==}
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -1292,6 +1316,14 @@ snapshots:
     dependencies:
       tslib: 2.8.1
     optional: true
+
+  '@fontsource/caveat@5.2.8': {}
+
+  '@fontsource/kalam@5.2.8': {}
+
+  '@fontsource/patrick-hand@5.2.8': {}
+
+  '@fontsource/shadows-into-light@5.2.8': {}
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
