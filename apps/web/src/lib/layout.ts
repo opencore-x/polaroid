@@ -55,7 +55,8 @@ export interface SheetLayout {
 
 export function sheetLayout(
   perRow: number,
-  marginMm = 8,
+  // 10mm keeps content inside the non-printable edge of typical home inkjets.
+  marginMm = 10,
   gapMm = 4,
 ): SheetLayout {
   const usableW = A4_MM.width - marginMm * 2
