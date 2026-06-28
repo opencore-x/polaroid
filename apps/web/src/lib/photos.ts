@@ -1,4 +1,9 @@
-import { type Crop, DEFAULT_CROP } from '@/lib/crop'
+import {
+  type Crop,
+  DEFAULT_CROP,
+  DEFAULT_ORIENTATION,
+  type Orientation,
+} from '@/lib/crop'
 
 export interface Photo {
   id: string
@@ -12,8 +17,10 @@ export interface Photo {
   captionBottom: string
   /** Place resolved from EXIF GPS — kept so the city/country toggle can switch. */
   place?: { city: string; country: string }
-  /** How the photo is framed inside its square window (pan + zoom). */
+  /** How the photo is framed inside its window (pan + zoom). */
   crop: Crop
+  /** Shape of the photo window (square / portrait / landscape). */
+  orientation: Orientation
   /** True while EXIF + reverse-geocoding is still running for this photo. */
   enriching: boolean
 }
@@ -36,6 +43,7 @@ export function createPhoto(file: File): Photo {
     captionTop: '',
     captionBottom: '',
     crop: DEFAULT_CROP,
+    orientation: DEFAULT_ORIENTATION,
     enriching: true,
   }
 }

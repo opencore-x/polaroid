@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import { type Crop } from '@/lib/crop'
+import { type Crop, type Orientation, orientationFor } from '@/lib/crop'
 import { formatCaptionDate } from '@/lib/date'
 import { readExif } from '@/lib/exif'
 import { reverseGeocode } from '@/lib/geocode'
@@ -22,6 +22,7 @@ interface PhotoState {
   setCaption: (id: string, field: CaptionField, value: string) => void
   /** Updates how a photo is framed (pan + zoom) inside its window. */
   setCrop: (id: string, crop: Crop) => void
+  setOrientation: (id: string, orientation: Orientation) => void
   /** Moves the photo with `activeId` to the position of `overId`. */
   reorder: (activeId: string, overId: string) => void
   /** Re-derives auto location captions when the city/country mode changes. */
@@ -34,7 +35,27 @@ export const usePhotoStore = create<PhotoState>((set) => {
   // Fills empty captions from EXIF — city from GPS, date from capture time.
   // Runs async after the photo appears; never overwrites a caption the user
   // has already typed.
+  // Defaults a photo's window orientation to its own aspect ratio, unless the
+  // user has already changed it away from the square default.
+  async function autoOrient(photo: Photo) {
+    try {
+      const bitmap = await createImageBitmap(photo.file)
+      const orientation = orientationFor(bitmap.width, bitmap.height)
+      bitmap.close()
+      set((state) => ({
+        photos: state.photos.map((p) =>
+          p.id === photo.id && p.orientation === 'square'
+            ? { ...p, orientation }
+            : p,
+        ),
+      }))
+    } catch {
+      // Leave the square default if the image can't be decoded.
+    }
+  }
+
   async function enrich(photo: Photo) {
+    void autoOrient(photo)
     try {
       const exif = await readExif(photo.file)
       const next: {
@@ -93,6 +114,12 @@ export const usePhotoStore = create<PhotoState>((set) => {
       set((state) => ({
         photos: state.photos.map((photo) =>
           photo.id === id ? { ...photo, crop } : photo,
+        ),
+      })),
+    setOrientation: (id, orientation) =>
+      set((state) => ({
+        photos: state.photos.map((photo) =>
+          photo.id === id ? { ...photo, orientation } : photo,
         ),
       })),
     reorder: (activeId, overId) =>
