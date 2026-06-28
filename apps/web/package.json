@@ -10,6 +10,10 @@
     "lint": "oxlint"
   },
   "dependencies": {
+    "@fontsource/caveat": "^5.2.8",
+    "@fontsource/kalam": "^5.2.8",
+    "@fontsource/patrick-hand": "^5.2.8",
+    "@fontsource/shadows-into-light": "^5.2.8",
     "@radix-ui/react-slot": "^1.3.0",
     "@tanstack/react-router": "^1.170.16",
     "class-variance-authority": "^0.7.1",
