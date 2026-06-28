@@ -10,6 +10,25 @@ export const MAX_PER_ROW = 5
 
 export type CaptionLocation = 'city' | 'country'
 
+/** The persistable subset of settings (no action functions). */
+export interface SettingsSnapshot {
+  framePadding: number
+  captionFontId: string
+  polaroidsPerRow: number
+  showCutMarks: boolean
+  captionLocation: CaptionLocation
+  showCaptions: boolean
+}
+
+export const PERSISTED_SETTINGS_KEYS: (keyof SettingsSnapshot)[] = [
+  'framePadding',
+  'captionFontId',
+  'polaroidsPerRow',
+  'showCutMarks',
+  'captionLocation',
+  'showCaptions',
+]
+
 interface SettingsState {
   /** White polaroid border width in px (sides/top); the bottom is thicker. */
   framePadding: number
