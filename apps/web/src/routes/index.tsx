@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import { A4Preview } from '@/components/a4-preview'
 import { PhotoDropzone } from '@/components/photo-dropzone'
 import { PhotoGrid } from '@/components/photo-grid'
 import { usePhotoStore } from '@/stores/photo-store'
@@ -23,6 +24,7 @@ function Home() {
 
       <PhotoDropzone compact={hasPhotos} />
       <PhotoGrid />
+      <A4Preview />
     </main>
   )
 }
