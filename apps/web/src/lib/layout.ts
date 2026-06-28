@@ -24,19 +24,24 @@ export interface Segment {
   y2: number
 }
 
-/** L-shaped trim ticks at each corner of a polaroid, extending outward (mm). */
-export function cropMarks(r: Rect, len = 2.5): Segment[] {
-  const x2 = r.x + r.width
-  const y2 = r.y + r.height
+/**
+ * L-shaped trim ticks at each corner of a polaroid, offset outward by `gap` so
+ * the marks point at the cut corners without inking the trim line itself.
+ */
+export function cropMarks(r: Rect, len = 2.5, gap = 1): Segment[] {
+  const left = r.x
+  const top = r.y
+  const right = r.x + r.width
+  const bottom = r.y + r.height
   return [
-    { x1: r.x - len, y1: r.y, x2: r.x, y2: r.y },
-    { x1: r.x, y1: r.y - len, x2: r.x, y2: r.y },
-    { x1: x2, y1: r.y, x2: x2 + len, y2: r.y },
-    { x1: x2, y1: r.y - len, x2: x2, y2: r.y },
-    { x1: r.x - len, y1: y2, x2: r.x, y2: y2 },
-    { x1: r.x, y1: y2, x2: r.x, y2: y2 + len },
-    { x1: x2, y1: y2, x2: x2 + len, y2: y2 },
-    { x1: x2, y1: y2, x2: x2, y2: y2 + len },
+    { x1: left - gap - len, y1: top, x2: left - gap, y2: top },
+    { x1: left, y1: top - gap - len, x2: left, y2: top - gap },
+    { x1: right + gap, y1: top, x2: right + gap + len, y2: top },
+    { x1: right, y1: top - gap - len, x2: right, y2: top - gap },
+    { x1: left - gap - len, y1: bottom, x2: left - gap, y2: bottom },
+    { x1: left, y1: bottom + gap, x2: left, y2: bottom + gap + len },
+    { x1: right + gap, y1: bottom, x2: right + gap + len, y2: bottom },
+    { x1: right, y1: bottom + gap, x2: right, y2: bottom + gap + len },
   ]
 }
 
