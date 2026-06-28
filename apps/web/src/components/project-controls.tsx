@@ -2,6 +2,11 @@ import { useRef, useState } from 'react'
 import { Download, Upload } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { downloadProject, importProject } from '@/lib/project'
 import { usePhotoStore } from '@/stores/photo-store'
 import { settingsSnapshot, useSettingsStore } from '@/stores/settings-store'
@@ -53,24 +58,36 @@ export function ProjectControls() {
             event.target.value = ''
           }}
         />
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={busy}
-          onClick={() => inputRef.current?.click()}
-        >
-          <Upload className="size-3.5" />
-          Open
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={busy || photos.length === 0}
-          onClick={() => void handleSave()}
-        >
-          <Download className="size-3.5" />
-          Save
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="icon"
+              className="size-8"
+              aria-label="Open project"
+              disabled={busy}
+              onClick={() => inputRef.current?.click()}
+            >
+              <Upload className="size-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Open project</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="icon"
+              className="size-8"
+              aria-label="Save project"
+              disabled={busy || photos.length === 0}
+              onClick={() => void handleSave()}
+            >
+              <Download className="size-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Save project</TooltipContent>
+        </Tooltip>
       </div>
       {error && <span className="text-destructive text-xs">{error}</span>}
     </div>
