@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 
 import { SheetControls } from '@/components/sheet-controls'
+import { SheetInspector } from '@/components/sheet-inspector'
 import { SheetPage } from '@/components/sheet-page'
 import { Button } from '@/components/ui/button'
 import { captionFontStack } from '@/lib/fonts'
@@ -51,36 +52,40 @@ export function A4Preview() {
     return () => observer.disconnect()
   }, [])
 
-  if (photos.length === 0) return null
-
   const { capacity } = sheetLayout(perRow, paper)
-  const pageCount = Math.max(1, Math.ceil(photos.length / capacity))
+  const pageCount = photos.length
+    ? Math.max(1, Math.ceil(photos.length / capacity))
+    : 1
   const pages = Array.from({ length: pageCount }, (_, page) =>
     photos.slice(page * capacity, (page + 1) * capacity),
   )
 
   return (
     <section className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <h2 className="text-sm font-medium">
           Print sheet ({paper.label})
           {pageCount > 1 ? ` — ${pageCount} pages` : ''}
         </h2>
         <Button
           size="sm"
-          disabled={isExporting}
+          disabled={isExporting || photos.length === 0}
           onClick={() => void handleExport()}
         >
           {isExporting ? 'Preparing…' : 'Export PDF'}
         </Button>
       </div>
       <SheetControls />
+      <SheetInspector />
       <div
         ref={containerRef}
         className="mx-auto flex w-full max-w-xl flex-col gap-5"
       >
         {pages.map((slice, page) => (
-          <div key={`page-${slice[0]?.id ?? page}`} className="flex flex-col gap-1">
+          <div
+            key={`page-${slice[0]?.id ?? page}`}
+            className="flex flex-col gap-1"
+          >
             {pageCount > 1 && (
               <span className="text-muted-foreground text-xs">
                 Page {page + 1} of {pageCount}
@@ -95,6 +100,7 @@ export function A4Preview() {
               showCutMarks={showCutMarks}
               showCaptions={showCaptions}
               showCameraLine={showCameraLine}
+              editable
             />
           </div>
         ))}
