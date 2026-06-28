@@ -42,12 +42,8 @@ export function A4Preview() {
 
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="text-center text-sm font-medium">
-        Print sheet ({paper.label})
-        {pageCount > 1 ? ` — ${pageCount} pages` : ''}
-      </h2>
-      {/* Floats over the page so the selected frame's tools follow you. */}
-      <div className="sticky top-2 z-20 mx-auto w-full max-w-xl empty:hidden">
+      {/* Pinned to the screen, so the selected frame's tools never shift the page. */}
+      <div className="pointer-events-none fixed inset-x-0 bottom-4 z-30 flex justify-center px-4">
         <SheetInspector />
       </div>
       <div
