@@ -1,26 +1,8 @@
-import {
-  Check,
-  RectangleHorizontal,
-  RectangleVertical,
-  Square,
-  Trash2,
-} from 'lucide-react'
+import { Check, Trash2 } from 'lucide-react'
 
-import {
-  MAX_CROP_SCALE,
-  MIN_CROP_SCALE,
-  ORIENTATIONS,
-  type Orientation,
-} from '@/lib/crop'
-import { cn } from '@/lib/utils'
+import { MAX_CROP_SCALE, MIN_CROP_SCALE } from '@/lib/crop'
 import { useEditorStore } from '@/stores/editor-store'
 import { usePhotoStore } from '@/stores/photo-store'
-
-const ORIENTATION_ICONS: Record<Orientation, typeof Square> = {
-  square: Square,
-  portrait: RectangleVertical,
-  landscape: RectangleHorizontal,
-}
 
 /** Controls for the frame currently selected on the sheet. */
 export function SheetInspector() {
@@ -29,7 +11,6 @@ export function SheetInspector() {
   const photo = usePhotoStore((state) =>
     state.photos.find((item) => item.id === selectedId),
   )
-  const setOrientation = usePhotoStore((state) => state.setOrientation)
   const setCrop = usePhotoStore((state) => state.setCrop)
   const remove = usePhotoStore((state) => state.remove)
 
@@ -40,27 +21,6 @@ export function SheetInspector() {
       <span className="text-muted-foreground hidden text-xs font-medium sm:inline">
         Drag to reposition
       </span>
-      <div className="flex gap-0.5">
-        {ORIENTATIONS.map((orientation) => {
-          const Icon = ORIENTATION_ICONS[orientation]
-          const active = photo.orientation === orientation
-          return (
-            <button
-              key={orientation}
-              type="button"
-              aria-label={`${orientation} frame`}
-              aria-pressed={active}
-              onClick={() => setOrientation(photo.id, orientation)}
-              className={cn(
-                'flex size-6 items-center justify-center rounded text-neutral-500 hover:bg-neutral-100',
-                active && 'bg-neutral-200 text-neutral-900',
-              )}
-            >
-              <Icon className="size-3.5" />
-            </button>
-          )
-        })}
-      </div>
       <div className="flex items-center gap-2">
         <span className="text-muted-foreground text-xs font-medium">Zoom</span>
         <input
@@ -86,7 +46,7 @@ export function SheetInspector() {
           select(null)
           remove(photo.id)
         }}
-        className="text-muted-foreground hover:text-destructive hover:bg-neutral-100 ml-auto flex size-7 items-center justify-center rounded"
+        className="text-muted-foreground hover:text-destructive ml-auto flex size-7 items-center justify-center rounded hover:bg-neutral-100"
       >
         <Trash2 className="size-4" />
       </button>
@@ -94,7 +54,7 @@ export function SheetInspector() {
         type="button"
         aria-label="Done"
         onClick={() => select(null)}
-        className="text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 flex size-7 items-center justify-center rounded"
+        className="flex size-7 items-center justify-center rounded text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
       >
         <Check className="size-4" />
       </button>

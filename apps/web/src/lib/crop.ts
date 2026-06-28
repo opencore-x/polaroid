@@ -89,27 +89,3 @@ export function coverStyle(
     top: `${(-sy / sh) * 100}%`,
   }
 }
-
-/** Centred window dimensions for an orientation inside a square box of side B. */
-export function windowBox(box: number, orientation: Orientation) {
-  const aspect = orientationAspect(orientation)
-  const width = aspect >= 1 ? box : box * aspect
-  const height = aspect >= 1 ? box / aspect : box
-  return {
-    width,
-    height,
-    left: (box - width) / 2,
-    top: (box - height) / 2,
-  }
-}
-
-/** Same as `windowBox` but as CSS percentage strings of a square frame. */
-export function windowPercent(orientation: Orientation) {
-  const box = windowBox(100, orientation)
-  return {
-    width: `${box.width}%`,
-    height: `${box.height}%`,
-    left: `${box.left}%`,
-    top: `${box.top}%`,
-  }
-}
