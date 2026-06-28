@@ -1,3 +1,5 @@
+import { type Crop, DEFAULT_CROP } from '@/lib/crop'
+
 export interface Photo {
   id: string
   file: File
@@ -10,6 +12,8 @@ export interface Photo {
   captionBottom: string
   /** Place resolved from EXIF GPS — kept so the city/country toggle can switch. */
   place?: { city: string; country: string }
+  /** How the photo is framed inside its square window (pan + zoom). */
+  crop: Crop
   /** True while EXIF + reverse-geocoding is still running for this photo. */
   enriching: boolean
 }
@@ -31,6 +35,7 @@ export function createPhoto(file: File): Photo {
     size: file.size,
     captionTop: '',
     captionBottom: '',
+    crop: DEFAULT_CROP,
     enriching: true,
   }
 }
