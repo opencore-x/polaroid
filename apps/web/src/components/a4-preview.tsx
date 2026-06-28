@@ -4,7 +4,7 @@ import { SheetControls } from '@/components/sheet-controls'
 import { SheetPage } from '@/components/sheet-page'
 import { Button } from '@/components/ui/button'
 import { captionFontStack } from '@/lib/fonts'
-import { sheetLayout } from '@/lib/layout'
+import { paperSize, sheetLayout } from '@/lib/layout'
 import { downloadSheetPdf } from '@/lib/pdf'
 import { usePhotoStore } from '@/stores/photo-store'
 import { useSettingsStore } from '@/stores/settings-store'
@@ -12,10 +12,12 @@ import { useSettingsStore } from '@/stores/settings-store'
 export function A4Preview() {
   const photos = usePhotoStore((state) => state.photos)
   const captionFontId = useSettingsStore((state) => state.captionFontId)
+  const paperSizeId = useSettingsStore((state) => state.paperSizeId)
   const perRow = useSettingsStore((state) => state.polaroidsPerRow)
   const showCutMarks = useSettingsStore((state) => state.showCutMarks)
   const showCaptions = useSettingsStore((state) => state.showCaptions)
   const fontStack = captionFontStack(captionFontId)
+  const paper = paperSize(paperSizeId)
 
   const containerRef = useRef<HTMLDivElement>(null)
   const [width, setWidth] = useState(0)
@@ -24,7 +26,7 @@ export function A4Preview() {
   const handleExport = async () => {
     setIsExporting(true)
     try {
-      await downloadSheetPdf(photos, perRow, showCutMarks, showCaptions)
+      await downloadSheetPdf(photos, perRow, showCutMarks, showCaptions, paper)
     } finally {
       setIsExporting(false)
     }
@@ -42,7 +44,7 @@ export function A4Preview() {
 
   if (photos.length === 0) return null
 
-  const { capacity } = sheetLayout(perRow)
+  const { capacity } = sheetLayout(perRow, paper)
   const pageCount = Math.max(1, Math.ceil(photos.length / capacity))
   const pages = Array.from({ length: pageCount }, (_, page) =>
     photos.slice(page * capacity, (page + 1) * capacity),
@@ -52,7 +54,8 @@ export function A4Preview() {
     <section className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-medium">
-          Print sheet (A4){pageCount > 1 ? ` — ${pageCount} pages` : ''}
+          Print sheet ({paper.label})
+          {pageCount > 1 ? ` — ${pageCount} pages` : ''}
         </h2>
         <Button
           size="sm"
@@ -78,6 +81,7 @@ export function A4Preview() {
               photos={slice}
               width={width}
               perRow={perRow}
+              paper={paper}
               fontStack={fontStack}
               showCutMarks={showCutMarks}
               showCaptions={showCaptions}
