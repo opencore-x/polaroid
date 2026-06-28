@@ -1,10 +1,10 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 
 import { SheetControls } from '@/components/sheet-controls'
-import { SheetPolaroid } from '@/components/sheet-polaroid'
+import { SheetPage } from '@/components/sheet-page'
 import { Button } from '@/components/ui/button'
 import { captionFontStack } from '@/lib/fonts'
-import { A4_MM, cropMarks, sheetLayout } from '@/lib/layout'
+import { sheetLayout } from '@/lib/layout'
 import { downloadSheetPdf } from '@/lib/pdf'
 import { usePhotoStore } from '@/stores/photo-store'
 import { useSettingsStore } from '@/stores/settings-store'
@@ -41,16 +41,18 @@ export function A4Preview() {
 
   if (photos.length === 0) return null
 
-  const layout = sheetLayout(perRow)
-  const mmToPx = width / A4_MM.width
-  const pageHeight = width * (A4_MM.height / A4_MM.width)
-  const shown = photos.slice(0, layout.capacity)
-  const overflow = photos.length - shown.length
+  const { capacity } = sheetLayout(perRow)
+  const pageCount = Math.max(1, Math.ceil(photos.length / capacity))
+  const pages = Array.from({ length: pageCount }, (_, page) =>
+    photos.slice(page * capacity, (page + 1) * capacity),
+  )
 
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-medium">Print sheet (A4)</h2>
+        <h2 className="text-sm font-medium">
+          Print sheet (A4){pageCount > 1 ? ` — ${pageCount} pages` : ''}
+        </h2>
         <Button
           size="sm"
           disabled={isExporting}
@@ -60,66 +62,27 @@ export function A4Preview() {
         </Button>
       </div>
       <SheetControls />
-      <div ref={containerRef} className="mx-auto w-full max-w-xl">
-        <div
-          className="relative bg-white shadow-md ring-1 ring-black/10"
-          style={{ width: width || '100%', height: pageHeight }}
-        >
-          <div
-            className="pointer-events-none absolute border border-dashed border-neutral-300"
-            style={{
-              left: layout.marginMm * mmToPx,
-              top: layout.marginMm * mmToPx,
-              right: layout.marginMm * mmToPx,
-              bottom: layout.marginMm * mmToPx,
-            }}
-          />
-          {width > 0 &&
-            shown.map((photo, index) => {
-              const rect = layout.rectFor(index)
-              return (
-                <div
-                  key={photo.id}
-                  className="absolute"
-                  style={{ left: rect.x * mmToPx, top: rect.y * mmToPx }}
-                >
-                  <SheetPolaroid
-                    photo={photo}
-                    width={rect.width * mmToPx}
-                    fontStack={fontStack}
-                  />
-                </div>
-              )
-            })}
-          {showCutMarks && width > 0 && (
-            <svg
-              className="pointer-events-none absolute inset-0"
+      <div
+        ref={containerRef}
+        className="mx-auto flex w-full max-w-xl flex-col gap-5"
+      >
+        {pages.map((slice, page) => (
+          <div key={`page-${slice[0]?.id ?? page}`} className="flex flex-col gap-1">
+            {pageCount > 1 && (
+              <span className="text-muted-foreground text-xs">
+                Page {page + 1} of {pageCount}
+              </span>
+            )}
+            <SheetPage
+              photos={slice}
               width={width}
-              height={pageHeight}
-            >
-              {shown.flatMap((photo, index) =>
-                cropMarks(layout.rectFor(index)).map((seg, segIndex) => (
-                  <line
-                    key={`${photo.id}-${segIndex}`}
-                    x1={seg.x1 * mmToPx}
-                    y1={seg.y1 * mmToPx}
-                    x2={seg.x2 * mmToPx}
-                    y2={seg.y2 * mmToPx}
-                    stroke="#9ca3af"
-                    strokeWidth={0.75}
-                  />
-                )),
-              )}
-            </svg>
-          )}
-        </div>
+              perRow={perRow}
+              fontStack={fontStack}
+              showCutMarks={showCutMarks}
+            />
+          </div>
+        ))}
       </div>
-      {overflow > 0 && (
-        <p className="text-muted-foreground text-xs">
-          +{overflow} more won&apos;t fit on this sheet — multipage support is
-          coming.
-        </p>
-      )}
     </section>
   )
 }
