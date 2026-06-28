@@ -144,3 +144,6 @@ vite.config.ts.timestamp-*
 
 # Turborepo
 .turbo
+
+# Local EXIF test images (downloaded, not part of the repo)
+/test-assets/
