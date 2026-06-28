@@ -20,6 +20,7 @@ export interface SettingsSnapshot {
   borderColor: string
   borderWidth: number
   frameShape: Orientation
+  pageShapes: Orientation[]
   captionFontId: string
   paperSizeId: string
   polaroidsPerRow: number
@@ -42,6 +43,7 @@ export const PERSISTED_SETTINGS_KEYS: (keyof SettingsSnapshot)[] = [
   'borderColor',
   'borderWidth',
   'frameShape',
+  'pageShapes',
   'captionFontId',
   'paperSizeId',
   'polaroidsPerRow',
@@ -59,9 +61,15 @@ interface SettingsState {
   /** Border thickness as a fraction of the frame width (sides/top). */
   borderWidth: number
   setBorderWidth: (ratio: number) => void
-  /** Frame shape for the whole sheet — the photo covers a box of this aspect. */
+  /** Default frame shape — used for any page without its own override. */
   frameShape: Orientation
   setFrameShape: (shape: Orientation) => void
+  /** Per-page shape overrides, indexed by page number (sparse). */
+  pageShapes: Orientation[]
+  /** Override one page's shape. */
+  setPageShape: (page: number, shape: Orientation) => void
+  /** Apply one shape to every page and clear the per-page overrides. */
+  setFrameShapeAll: (shape: Orientation) => void
   captionFontId: string
   setCaptionFont: (id: string) => void
   /** Selected print stock (A4, Letter, 4×6, …). */
@@ -94,6 +102,14 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   setBorderWidth: (ratio) => set({ borderWidth: ratio }),
   frameShape: DEFAULT_ORIENTATION,
   setFrameShape: (shape) => set({ frameShape: shape }),
+  pageShapes: [],
+  setPageShape: (page, shape) =>
+    set((state) => {
+      const pageShapes = state.pageShapes.slice()
+      pageShapes[page] = shape
+      return { pageShapes }
+    }),
+  setFrameShapeAll: (shape) => set({ frameShape: shape, pageShapes: [] }),
   captionFontId: DEFAULT_CAPTION_FONT_ID,
   setCaptionFont: (id) => set({ captionFontId: id }),
   paperSizeId: DEFAULT_PAPER_SIZE_ID,
