@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 
+import { type Crop } from '@/lib/crop'
 import { formatCaptionDate } from '@/lib/date'
 import { readExif } from '@/lib/exif'
 import { reverseGeocode } from '@/lib/geocode'
@@ -19,6 +20,8 @@ interface PhotoState {
   /** Adds image files to the collection. Returns how many were accepted. */
   addFiles: (files: File[]) => number
   setCaption: (id: string, field: CaptionField, value: string) => void
+  /** Updates how a photo is framed (pan + zoom) inside its window. */
+  setCrop: (id: string, crop: Crop) => void
   /** Moves the photo with `activeId` to the position of `overId`. */
   reorder: (activeId: string, overId: string) => void
   /** Re-derives auto location captions when the city/country mode changes. */
@@ -84,6 +87,12 @@ export const usePhotoStore = create<PhotoState>((set) => {
       set((state) => ({
         photos: state.photos.map((photo) =>
           photo.id === id ? { ...photo, [field]: value } : photo,
+        ),
+      })),
+    setCrop: (id, crop) =>
+      set((state) => ({
+        photos: state.photos.map((photo) =>
+          photo.id === id ? { ...photo, crop } : photo,
         ),
       })),
     reorder: (activeId, overId) =>
