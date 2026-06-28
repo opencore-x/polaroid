@@ -37,6 +37,7 @@ export function A4Preview() {
   const borderColor = useSettingsStore((state) => state.borderColor)
   const borderWidth = useSettingsStore((state) => state.borderWidth)
   const perRow = useSettingsStore((state) => state.polaroidsPerRow)
+  const rows = useSettingsStore((state) => state.rowsPerPage)
   const showCutMarks = useSettingsStore((state) => state.showCutMarks)
   const showCaptions = useSettingsStore((state) => state.showCaptions)
   const showCameraLine = useSettingsStore((state) => state.showCameraLine)
@@ -56,7 +57,7 @@ export function A4Preview() {
     return () => observer.disconnect()
   }, [])
 
-  const pages = paginate(photos, perRow, paper, frameShape, pageShapes, borderWidth)
+  const pages = paginate(photos, perRow, rows, paper, frameShape, pageShapes, borderWidth)
   const pageCount = pages.length
 
   return (
@@ -87,6 +88,7 @@ export function A4Preview() {
               photos={slice.photos}
               width={width}
               perRow={perRow}
+              rows={rows}
               paper={paper}
               shape={slice.shape}
               borderColor={borderColor}

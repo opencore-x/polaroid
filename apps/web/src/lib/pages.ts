@@ -9,13 +9,15 @@ export interface SheetSlice {
 }
 
 /**
- * Splits photos into pages. Each page can have its own shape (from `pageShapes`,
- * falling back to `defaultShape`), and since capacity depends on the shape, the
- * fill is sequential — a tall page simply holds fewer frames than a square one.
+ * Splits photos into pages of an explicit `perRow × rows` grid. Each page can
+ * have its own shape (from `pageShapes`, falling back to `defaultShape`); the
+ * frame count per page is fixed at `perRow * rows` regardless of shape, since
+ * cells are sized to fit rather than packed to whatever the height allows.
  */
 export function paginate(
   photos: Photo[],
   perRow: number,
+  rows: number,
   paper: PaperSize,
   defaultShape: Orientation,
   pageShapes: Orientation[],
@@ -29,7 +31,7 @@ export function paginate(
   let page = 0
   while (index < photos.length) {
     const shape = shapeAt(page)
-    const { capacity } = sheetLayout(perRow, paper, shape, border)
+    const { capacity } = sheetLayout(perRow, rows, paper, shape, border)
     pages.push({ shape, photos: photos.slice(index, index + capacity) })
     index += capacity
     page++
