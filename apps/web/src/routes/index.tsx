@@ -4,6 +4,7 @@ import { A4Preview } from '@/components/a4-preview'
 import { OptionsPanel } from '@/components/options-panel'
 import { PhotoSidebar } from '@/components/photo-sidebar'
 import { ProjectControls } from '@/components/project-controls'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 export const Route = createFileRoute('/')({
   component: Home,
@@ -19,7 +20,10 @@ function Home() {
             Edit each frame on the page — everything stays on your device.
           </p>
         </div>
-        <ProjectControls />
+        <div className="flex items-start gap-2">
+          <ThemeToggle />
+          <ProjectControls />
+        </div>
       </header>
 
       <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)_300px] lg:items-start">
