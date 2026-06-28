@@ -31,7 +31,6 @@ export function paperSize(id: string): PaperSize {
 // Polaroid proportions, expressed as ratios of the polaroid's width so the same
 // numbers drive the on-screen preview (px) and the exported PDF (pt).
 export const POLAROID = {
-  framePad: 0.05, // even white border on the sides + top
   captionBand: 0.25, // thicker bottom band that holds the captions
   captionTopSize: 0.1, // city line font size
   captionBottomSize: 0.075, // date line font size
@@ -44,16 +43,35 @@ export const FRAME_SHAPES: { id: Orientation; label: string }[] = [
   { id: 'landscape', label: 'Wide' },
 ]
 
+export const DEFAULT_BORDER_COLOR = '#ffffff'
+export const DEFAULT_BORDER_WIDTH = 0.05
+
+/** Retro border swatches (Lalalab-style), plus white. */
+export const BORDER_COLORS: { hex: string; label: string }[] = [
+  { hex: '#ffffff', label: 'White' },
+  { hex: '#f4ece1', label: 'Cream' },
+  { hex: '#111111', label: 'Black' },
+  { hex: '#f7b8c6', label: 'Pink' },
+  { hex: '#ff6f5e', label: 'Coral' },
+  { hex: '#a7d3e6', label: 'Sky' },
+]
+
+/** Border thickness presets, as a fraction of the frame width. */
+export const BORDER_WIDTHS: { ratio: number; label: string }[] = [
+  { ratio: 0.035, label: 'Thin' },
+  { ratio: 0.05, label: 'Medium' },
+  { ratio: 0.08, label: 'Thick' },
+]
+
 /**
  * Card height ÷ width for a shape: an even border around a photo box whose
  * aspect follows the shape, plus the thicker caption band at the bottom.
  */
-export function cardAspect(shape: Orientation): number {
-  return (
-    POLAROID.framePad +
-    (1 - POLAROID.framePad * 2) / orientationAspect(shape) +
-    POLAROID.captionBand
-  )
+export function cardAspect(
+  shape: Orientation,
+  border = DEFAULT_BORDER_WIDTH,
+): number {
+  return border + (1 - border * 2) / orientationAspect(shape) + POLAROID.captionBand
 }
 
 export interface Rect {
@@ -108,13 +126,14 @@ export function sheetLayout(
   perRow: number,
   paper: PaperSize,
   shape: Orientation = 'square',
+  border = DEFAULT_BORDER_WIDTH,
   gapMm = 4,
 ): SheetLayout {
   const marginMm = paper.marginMm
   const usableW = paper.widthMm - marginMm * 2
   const usableH = paper.heightMm - marginMm * 2
   const cellWidthMm = (usableW - gapMm * (perRow - 1)) / perRow
-  const cellHeightMm = cellWidthMm * cardAspect(shape)
+  const cellHeightMm = cellWidthMm * cardAspect(shape, border)
   const rows = Math.max(1, Math.floor((usableH + gapMm) / (cellHeightMm + gapMm)))
   const capacity = perRow * rows
 
