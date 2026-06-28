@@ -1,12 +1,13 @@
 import { SheetPolaroid } from '@/components/sheet-polaroid'
-import { A4_MM, cropMarks, sheetLayout } from '@/lib/layout'
+import { type PaperSize, cropMarks, sheetLayout } from '@/lib/layout'
 import { type Photo } from '@/lib/photos'
 
-/** One A4 sheet: margin guide, positioned polaroids, and crop marks. */
+/** One print sheet: margin guide, positioned polaroids, and crop marks. */
 export function SheetPage({
   photos,
   width,
   perRow,
+  paper,
   fontStack,
   showCutMarks,
   showCaptions,
@@ -14,13 +15,14 @@ export function SheetPage({
   photos: Photo[]
   width: number
   perRow: number
+  paper: PaperSize
   fontStack: string
   showCutMarks: boolean
   showCaptions: boolean
 }) {
-  const layout = sheetLayout(perRow)
-  const mmToPx = width / A4_MM.width
-  const pageHeight = width * (A4_MM.height / A4_MM.width)
+  const layout = sheetLayout(perRow, paper)
+  const mmToPx = width / paper.widthMm
+  const pageHeight = width * (paper.heightMm / paper.widthMm)
 
   return (
     <div
