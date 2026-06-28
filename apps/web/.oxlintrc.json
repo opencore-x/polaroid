@@ -1,0 +1,7 @@
+{
+  "plugins": ["react", "typescript", "import"],
+  "categories": {
+    "correctness": "error"
+  },
+  "ignorePatterns": ["dist", "**/routeTree.gen.ts"]
+}
