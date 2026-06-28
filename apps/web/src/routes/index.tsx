@@ -1,20 +1,28 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { Button } from '@/components/ui/button'
+import { PhotoDropzone } from '@/components/photo-dropzone'
+import { PhotoGrid } from '@/components/photo-grid'
+import { usePhotoStore } from '@/stores/photo-store'
 
 export const Route = createFileRoute('/')({
   component: Home,
 })
 
 function Home() {
+  const hasPhotos = usePhotoStore((state) => state.photos.length > 0)
+
   return (
-    <main className="mx-auto flex min-h-svh max-w-2xl flex-col items-center justify-center gap-6 p-8 text-center">
-      <h1 className="text-4xl font-semibold tracking-tight">Polaroid</h1>
-      <p className="text-muted-foreground text-balance">
-        Arrange photos polaroid-style with EXIF auto-captions and tile them onto
-        A4 sheets for print-at-home. Private, client-side, free.
-      </p>
-      <Button>Get started</Button>
+    <main className="mx-auto flex min-h-svh w-full max-w-4xl flex-col gap-8 p-6 sm:p-8">
+      <header className="flex flex-col gap-1">
+        <h1 className="text-2xl font-semibold tracking-tight">Polaroid</h1>
+        <p className="text-muted-foreground text-sm">
+          Add your photos to start building polaroid-style A4 sheets. Everything
+          stays on your device.
+        </p>
+      </header>
+
+      <PhotoDropzone compact={hasPhotos} />
+      <PhotoGrid />
     </main>
   )
 }
