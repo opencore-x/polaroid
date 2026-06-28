@@ -2,6 +2,7 @@ import { type ReactNode, useState } from 'react'
 import { Minus, Plus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import { type Orientation } from '@/lib/crop'
 import { DATE_FORMATS, type DateFormat } from '@/lib/date'
 import { CAPTION_FONTS } from '@/lib/fonts'
 import { LOCATION_DETAILS } from '@/lib/geocode'
@@ -12,6 +13,7 @@ import {
   PAPER_SIZES,
   paperSize,
 } from '@/lib/layout'
+import { paginate } from '@/lib/pages'
 import { downloadSheetPdf } from '@/lib/pdf'
 import { cn } from '@/lib/utils'
 import { usePhotoStore } from '@/stores/photo-store'
@@ -44,7 +46,8 @@ export function OptionsPanel() {
   const paperSizeId = useSettingsStore((state) => state.paperSizeId)
   const setPaperSize = useSettingsStore((state) => state.setPaperSize)
   const frameShape = useSettingsStore((state) => state.frameShape)
-  const setFrameShape = useSettingsStore((state) => state.setFrameShape)
+  const pageShapes = useSettingsStore((state) => state.pageShapes)
+  const setFrameShapeAll = useSettingsStore((state) => state.setFrameShapeAll)
   const borderColor = useSettingsStore((state) => state.borderColor)
   const setBorderColor = useSettingsStore((state) => state.setBorderColor)
   const borderWidth = useSettingsStore((state) => state.borderWidth)
@@ -56,6 +59,13 @@ export function OptionsPanel() {
 
   const [isExporting, setIsExporting] = useState(false)
   const paper = paperSize(paperSizeId)
+
+  // When pages carry different shapes the dropdown reads "Mixed"; picking a
+  // shape there applies it to every page.
+  const pages = paginate(photos, perRow, paper, frameShape, pageShapes, borderWidth)
+  const uniformShape = pages.every((p) => p.shape === pages[0].shape)
+    ? pages[0].shape
+    : null
 
   const selectLocation = (value: CaptionLocation) => {
     setCaptionLocation(value)
@@ -77,6 +87,7 @@ export function OptionsPanel() {
         showCameraLine,
         paper,
         frameShape,
+        pageShapes,
         borderColor,
         borderWidth,
         captionFontId,
@@ -149,11 +160,17 @@ export function OptionsPanel() {
           <select
             id="opt-shape"
             className={SELECT_CLASS}
-            value={frameShape}
-            onChange={(event) =>
-              setFrameShape(event.target.value as typeof frameShape)
-            }
+            value={uniformShape ?? 'mixed'}
+            onChange={(event) => {
+              if (event.target.value !== 'mixed')
+                setFrameShapeAll(event.target.value as Orientation)
+            }}
           >
+            {!uniformShape && (
+              <option value="mixed" disabled>
+                Mixed
+              </option>
+            )}
             {FRAME_SHAPES.map((option) => (
               <option key={option.id} value={option.id}>
                 {option.label}
