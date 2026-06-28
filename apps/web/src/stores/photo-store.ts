@@ -30,6 +30,8 @@ interface PhotoState {
   /** Re-derives auto date captions when the date format changes. */
   applyDateFormat: (format: DateFormat) => void
   remove: (id: string) => void
+  /** Replaces the whole set (e.g. opening a project file), revoking old URLs. */
+  replaceAll: (photos: Photo[]) => void
   clear: () => void
 }
 
@@ -171,6 +173,11 @@ export const usePhotoStore = create<PhotoState>((set) => {
         const target = state.photos.find((photo) => photo.id === id)
         if (target) URL.revokeObjectURL(target.url)
         return { photos: state.photos.filter((photo) => photo.id !== id) }
+      }),
+    replaceAll: (photos) =>
+      set((state) => {
+        state.photos.forEach((photo) => URL.revokeObjectURL(photo.url))
+        return { photos }
       }),
     clear: () =>
       set((state) => {
