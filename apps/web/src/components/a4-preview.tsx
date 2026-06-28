@@ -1,8 +1,10 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 
 import { SheetPolaroid } from '@/components/sheet-polaroid'
+import { Button } from '@/components/ui/button'
 import { captionFontStack } from '@/lib/fonts'
 import { A4_MM, sheetLayout } from '@/lib/layout'
+import { downloadSheetPdf } from '@/lib/pdf'
 import { usePhotoStore } from '@/stores/photo-store'
 import { useSettingsStore } from '@/stores/settings-store'
 
@@ -14,6 +16,16 @@ export function A4Preview() {
 
   const containerRef = useRef<HTMLDivElement>(null)
   const [width, setWidth] = useState(0)
+  const [isExporting, setIsExporting] = useState(false)
+
+  const handleExport = async () => {
+    setIsExporting(true)
+    try {
+      await downloadSheetPdf(photos, perRow)
+    } finally {
+      setIsExporting(false)
+    }
+  }
 
   useLayoutEffect(() => {
     const el = containerRef.current
@@ -35,7 +47,16 @@ export function A4Preview() {
 
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="text-sm font-medium">Print sheet (A4)</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-sm font-medium">Print sheet (A4)</h2>
+        <Button
+          size="sm"
+          disabled={isExporting}
+          onClick={() => void handleExport()}
+        >
+          {isExporting ? 'Preparing…' : 'Export PDF'}
+        </Button>
+      </div>
       <div ref={containerRef} className="mx-auto w-full max-w-xl">
         <div
           className="relative bg-white shadow-md ring-1 ring-black/10"
