@@ -17,6 +17,9 @@ interface SettingsState {
   /** Polaroids per row on the A4 sheet. */
   polaroidsPerRow: number
   setPolaroidsPerRow: (count: number) => void
+  /** Show crop/cut guides for trimming after printing. */
+  showCutMarks: boolean
+  setShowCutMarks: (show: boolean) => void
 }
 
 export const useSettingsStore = create<SettingsState>((set) => ({
@@ -26,4 +29,6 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   setCaptionFont: (id) => set({ captionFontId: id }),
   polaroidsPerRow: 3,
   setPolaroidsPerRow: (count) => set({ polaroidsPerRow: count }),
+  showCutMarks: true,
+  setShowCutMarks: (show) => set({ showCutMarks: show }),
 }))
