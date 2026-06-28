@@ -24,6 +24,8 @@ interface PhotoMeta {
   captionTop: string
   captionBottom: string
   place?: { city: string; country: string }
+  takenAt?: number
+  cameraLine?: string
   crop?: Crop
   orientation?: Orientation
   /** Position on the sheet; metas are sorted by this on load. */
@@ -101,6 +103,8 @@ export async function loadSession(): Promise<{
         captionTop: meta.captionTop,
         captionBottom: meta.captionBottom,
         place: meta.place,
+        takenAt: meta.takenAt,
+        cameraLine: meta.cameraLine,
         crop: meta.crop ?? DEFAULT_CROP,
         orientation: meta.orientation ?? DEFAULT_ORIENTATION,
         enriching: false,
@@ -141,6 +145,8 @@ export async function savePhotos(photos: Photo[]): Promise<void> {
         captionTop: photo.captionTop,
         captionBottom: photo.captionBottom,
         place: photo.place,
+        takenAt: photo.takenAt,
+        cameraLine: photo.cameraLine,
         crop: photo.crop,
         orientation: photo.orientation,
         order,
