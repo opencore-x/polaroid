@@ -1,3 +1,4 @@
+import { type Crop, DEFAULT_CROP } from '@/lib/crop'
 import { type Photo } from '@/lib/photos'
 import { type SettingsSnapshot } from '@/stores/settings-store'
 
@@ -18,6 +19,7 @@ interface PhotoMeta {
   captionTop: string
   captionBottom: string
   place?: { city: string; country: string }
+  crop?: Crop
   /** Position on the sheet; metas are sorted by this on load. */
   order: number
 }
@@ -93,6 +95,7 @@ export async function loadSession(): Promise<{
         captionTop: meta.captionTop,
         captionBottom: meta.captionBottom,
         place: meta.place,
+        crop: meta.crop ?? DEFAULT_CROP,
         enriching: false,
       })
     }
@@ -131,6 +134,7 @@ export async function savePhotos(photos: Photo[]): Promise<void> {
         captionTop: photo.captionTop,
         captionBottom: photo.captionBottom,
         place: photo.place,
+        crop: photo.crop,
         order,
       }
       metaStore.put(meta, photo.id)
