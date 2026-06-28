@@ -32,6 +32,9 @@ importers:
       '@fontsource/kalam':
         specifier: ^5.2.8
         version: 5.2.8
+      '@fontsource/montserrat':
+        specifier: ^5.2.8
+        version: 5.2.8
       '@fontsource/patrick-hand':
         specifier: ^5.2.8
         version: 5.2.8
@@ -995,6 +998,9 @@ packages:
 
   '@fontsource/kalam@5.2.8':
     resolution: {integrity: sha512-9WDYPX1llS28xRjrqAoz3IOLeaBhCtL3HCtNanYnF1fthFPmSD5aESL6s7C1SJxAlxq/qzTlpIpw4S1W9+q3OA==}
+
+  '@fontsource/montserrat@5.2.8':
+    resolution: {integrity: sha512-xTjLxSbSfCycDB0pwmNsfNvdfWPaDaRQ2LC6yt/ZI7SdvXG52zHnzNYC/09mzuAuWNJyShkteutfCoDgym56hQ==}
 
   '@fontsource/patrick-hand@5.2.8':
     resolution: {integrity: sha512-FZx34VLuiF+Pjv/A/m1bTxjR6hAvmL6vdCp62uypVdgFvSrPrBOxX+vCXVy8lfNVFqvKfm/ghun+aaYVYqfBEg==}
@@ -4302,6 +4308,8 @@ snapshots:
   '@fontsource/indie-flower@5.2.7': {}
 
   '@fontsource/kalam@5.2.8': {}
+
+  '@fontsource/montserrat@5.2.8': {}
 
   '@fontsource/patrick-hand@5.2.8': {}
 
