@@ -1,4 +1,5 @@
 import { type ReactNode, useState } from 'react'
+import { Minus, Plus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { DATE_FORMATS, type DateFormat } from '@/lib/date'
@@ -143,21 +144,12 @@ export function OptionsPanel() {
           </select>
         </Field>
         <Field label="Per row" htmlFor="opt-perrow">
-          <span className="flex items-center gap-2">
-            <input
-              id="opt-perrow"
-              type="range"
-              min={MIN_PER_ROW}
-              max={MAX_PER_ROW}
-              step={1}
-              value={perRow}
-              onChange={(event) => setPerRow(Number(event.target.value))}
-              className="accent-primary w-24"
-            />
-            <span className="text-muted-foreground w-3 text-sm tabular-nums">
-              {perRow}
-            </span>
-          </span>
+          <Stepper
+            value={perRow}
+            min={MIN_PER_ROW}
+            max={MAX_PER_ROW}
+            onChange={setPerRow}
+          />
         </Field>
         <Toggle
           label="Cut marks"
@@ -174,6 +166,46 @@ export function OptionsPanel() {
         {isExporting ? 'Preparing…' : 'Export PDF'}
       </Button>
     </div>
+  )
+}
+
+function Stepper({
+  value,
+  min,
+  max,
+  onChange,
+}: {
+  value: number
+  min: number
+  max: number
+  onChange: (value: number) => void
+}) {
+  return (
+    <span className="flex items-center gap-1">
+      <Button
+        type="button"
+        variant="outline"
+        size="icon"
+        className="size-7"
+        aria-label="Fewer per row"
+        disabled={value <= min}
+        onClick={() => onChange(Math.max(min, value - 1))}
+      >
+        <Minus className="size-3.5" />
+      </Button>
+      <span className="w-4 text-center text-sm tabular-nums">{value}</span>
+      <Button
+        type="button"
+        variant="outline"
+        size="icon"
+        className="size-7"
+        aria-label="More per row"
+        disabled={value >= max}
+        onClick={() => onChange(Math.min(max, value + 1))}
+      >
+        <Plus className="size-3.5" />
+      </Button>
+    </span>
   )
 }
 
