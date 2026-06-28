@@ -1,6 +1,6 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
 
-import { type Crop, cropSource, windowBox } from '@/lib/crop'
+import { type Crop, type Orientation, cropSource, orientationAspect } from '@/lib/crop'
 import {
   type PaperSize,
   POLAROID,
@@ -63,6 +63,7 @@ export async function buildSheetPdf(
   showCaptions: boolean,
   showCameraLine: boolean,
   paper: PaperSize,
+  shape: Orientation,
   captionFontId: string,
 ): Promise<Uint8Array> {
   const doc = await PDFDocument.create()
@@ -71,7 +72,8 @@ export async function buildSheetPdf(
   const font =
     (await embedCaptionFont(doc, captionFontId)) ??
     (await doc.embedFont(StandardFonts.Helvetica))
-  const layout = sheetLayout(perRow, paper)
+  const layout = sheetLayout(perRow, paper, shape)
+  const aspect = orientationAspect(shape)
   const pageW = paper.widthMm * PT_PER_MM
   const pageH = paper.heightMm * PT_PER_MM
   const margin = layout.marginMm * PT_PER_MM
@@ -119,7 +121,8 @@ export async function buildSheetPdf(
       const h = r.height * PT_PER_MM
       const yTop = r.y * PT_PER_MM
       const pad = w * POLAROID.framePad
-      const imgSize = w - pad * 2
+      const imgW = w - pad * 2
+      const imgH = imgW / aspect
 
       page.drawRectangle({
         x,
@@ -131,30 +134,29 @@ export async function buildSheetPdf(
         borderWidth: 0.5,
       })
 
-      // The photo sits in an orientation window centred in the square image
-      // area; the surrounding letterbox stays the white frame colour.
-      const win = windowBox(imgSize, photo.orientation)
+      // The photo covers the image box edge-to-edge — the even border around it
+      // is the frame card showing through.
       const toPx = (pt: number) => Math.round((pt / PT_PER_MM) * (IMAGE_DPI / 25.4))
       const jpeg = await rasterizeJpeg(
         photo.url,
-        toPx(win.width),
-        toPx(win.height),
+        toPx(imgW),
+        toPx(imgH),
         photo.crop,
       )
       if (jpeg) {
         const embedded = await doc.embedJpg(jpeg)
         page.drawImage(embedded, {
-          x: x + pad + win.left,
-          y: pageH - yTop - pad - win.top - win.height,
-          width: win.width,
-          height: win.height,
+          x: x + pad,
+          y: pageH - yTop - pad - imgH,
+          width: imgW,
+          height: imgH,
         })
       }
 
       const cx = x + w / 2
       const topSize = w * POLAROID.captionTopSize
       const botSize = w * POLAROID.captionBottomSize
-      const capY = pageH - yTop - pad - imgSize - pad * 0.6
+      const capY = pageH - yTop - pad - imgH - pad * 0.6
       if (showCaptions && photo.captionTop) {
         page.drawText(photo.captionTop, {
           x: centerX(photo.captionTop, topSize, cx),
@@ -197,6 +199,7 @@ export async function downloadSheetPdf(
   showCaptions: boolean,
   showCameraLine: boolean,
   paper: PaperSize,
+  shape: Orientation,
   captionFontId: string,
   filename = 'polaroids.pdf',
 ): Promise<void> {
@@ -207,6 +210,7 @@ export async function downloadSheetPdf(
     showCaptions,
     showCameraLine,
     paper,
+    shape,
     captionFontId,
   )
   const blob = new Blob([bytes as BlobPart], { type: 'application/pdf' })
