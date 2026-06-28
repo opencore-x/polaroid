@@ -11,6 +11,8 @@ export function SheetPage({
   perRow,
   paper,
   shape,
+  borderColor,
+  borderWidth,
   fontStack,
   showCutMarks,
   showCaptions,
@@ -22,6 +24,8 @@ export function SheetPage({
   perRow: number
   paper: PaperSize
   shape: Orientation
+  borderColor: string
+  borderWidth: number
   fontStack: string
   showCutMarks: boolean
   showCaptions: boolean
@@ -30,7 +34,7 @@ export function SheetPage({
 }) {
   const selectedId = useEditorStore((state) => state.selectedId)
   const select = useEditorStore((state) => state.select)
-  const layout = sheetLayout(perRow, paper, shape)
+  const layout = sheetLayout(perRow, paper, shape, borderWidth)
   const mmToPx = width / paper.widthMm
   const pageHeight = width * (paper.heightMm / paper.widthMm)
 
@@ -66,6 +70,8 @@ export function SheetPage({
                 photo={photo}
                 width={rect.width * mmToPx}
                 shape={shape}
+                borderColor={borderColor}
+                borderWidth={borderWidth}
                 fontStack={fontStack}
                 showCaptions={showCaptions}
                 showCameraLine={showCameraLine}

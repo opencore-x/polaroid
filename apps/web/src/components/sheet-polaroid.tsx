@@ -1,6 +1,7 @@
 import { type CSSProperties } from 'react'
 
 import { CroppedImage } from '@/components/cropped-image'
+import { captionColors } from '@/lib/color'
 import { type Orientation, orientationAspect } from '@/lib/crop'
 import { POLAROID, cardAspect } from '@/lib/layout'
 import { type Photo } from '@/lib/photos'
@@ -16,6 +17,8 @@ export function SheetPolaroid({
   photo,
   width,
   shape,
+  borderColor,
+  borderWidth,
   fontStack,
   showCaptions,
   showCameraLine,
@@ -26,6 +29,8 @@ export function SheetPolaroid({
   photo: Photo
   width: number
   shape: Orientation
+  borderColor: string
+  borderWidth: number
   fontStack: string
   showCaptions: boolean
   showCameraLine: boolean
@@ -35,24 +40,26 @@ export function SheetPolaroid({
 }) {
   const setCrop = usePhotoStore((state) => state.setCrop)
   const setCaption = usePhotoStore((state) => state.setCaption)
-  const pad = width * POLAROID.framePad
+  const pad = width * borderWidth
   const aspect = orientationAspect(shape)
   const imageH = (width - pad * 2) / aspect
+  const ink = captionColors(borderColor)
   const editing = editable && selected
 
   return (
     <div
       className={cn(
-        'flex flex-col bg-white shadow-sm transition-[outline-color]',
+        'flex flex-col shadow-sm transition-[outline-color]',
         editable && 'cursor-pointer outline outline-2 outline-transparent',
         editable && !selected && 'hover:outline-ring/40',
         selected && 'outline-primary',
       )}
       style={{
         width,
-        height: width * cardAspect(shape),
+        height: width * cardAspect(shape, borderWidth),
         padding: pad,
         paddingBottom: 0,
+        backgroundColor: borderColor,
         outlineOffset: 2,
       }}
       onClick={
@@ -90,7 +97,7 @@ export function SheetPolaroid({
               style={{
                 fontSize: width * POLAROID.captionTopSize,
                 lineHeight: 1.1,
-                color: '#262626',
+                color: ink.top,
               }}
             />
             <CaptionLine
@@ -101,13 +108,13 @@ export function SheetPolaroid({
               style={{
                 fontSize: width * POLAROID.captionBottomSize,
                 lineHeight: 1.1,
-                color: '#737373',
+                color: ink.bottom,
               }}
             />
             {showCameraLine && photo.cameraLine && (
               <span
                 className="max-w-full truncate"
-                style={{ fontSize: width * 0.045, lineHeight: 1.2, color: '#a3a3a3' }}
+                style={{ fontSize: width * 0.045, lineHeight: 1.2, color: ink.camera }}
               >
                 {photo.cameraLine}
               </span>

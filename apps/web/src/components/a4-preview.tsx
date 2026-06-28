@@ -13,6 +13,8 @@ export function A4Preview() {
   const captionFontId = useSettingsStore((state) => state.captionFontId)
   const paperSizeId = useSettingsStore((state) => state.paperSizeId)
   const frameShape = useSettingsStore((state) => state.frameShape)
+  const borderColor = useSettingsStore((state) => state.borderColor)
+  const borderWidth = useSettingsStore((state) => state.borderWidth)
   const perRow = useSettingsStore((state) => state.polaroidsPerRow)
   const showCutMarks = useSettingsStore((state) => state.showCutMarks)
   const showCaptions = useSettingsStore((state) => state.showCaptions)
@@ -33,7 +35,7 @@ export function A4Preview() {
     return () => observer.disconnect()
   }, [])
 
-  const { capacity } = sheetLayout(perRow, paper, frameShape)
+  const { capacity } = sheetLayout(perRow, paper, frameShape, borderWidth)
   const pageCount = photos.length
     ? Math.max(1, Math.ceil(photos.length / capacity))
     : 1
@@ -67,6 +69,8 @@ export function A4Preview() {
               perRow={perRow}
               paper={paper}
               shape={frameShape}
+              borderColor={borderColor}
+              borderWidth={borderWidth}
               fontStack={fontStack}
               showCutMarks={showCutMarks}
               showCaptions={showCaptions}
