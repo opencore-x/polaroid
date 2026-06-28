@@ -147,3 +147,6 @@ vite.config.ts.timestamp-*
 
 # Local EXIF test images (downloaded, not part of the repo)
 /test-assets/
+
+# Cloudflare Wrangler local state
+.wrangler/
