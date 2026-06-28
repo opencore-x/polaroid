@@ -1,5 +1,5 @@
 import { DATE_FORMATS, type DateFormat } from '@/lib/date'
-import { cn } from '@/lib/utils'
+import { LOCATION_DETAILS } from '@/lib/geocode'
 import { usePhotoStore } from '@/stores/photo-store'
 import {
   type CaptionLocation,
@@ -33,26 +33,29 @@ export function CaptionControls() {
   return (
     <div className="flex flex-wrap items-center gap-3">
       <div className="flex items-center gap-1.5">
-        <span className="text-muted-foreground text-xs font-medium">
+        <label
+          htmlFor="location-detail"
+          className="text-muted-foreground text-xs font-medium"
+        >
           Location
-        </span>
-        <div className="border-input flex overflow-hidden rounded-md border text-xs">
-          {(['city', 'country'] as const).map((location) => (
-            <button
-              key={location}
-              type="button"
-              onClick={() => selectLocation(location)}
-              className={cn(
-                'px-2 py-1 capitalize',
-                captionLocation === location
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-background hover:bg-accent',
-              )}
-            >
-              {location}
-            </button>
+        </label>
+        <select
+          id="location-detail"
+          value={captionLocation}
+          onChange={(event) =>
+            selectLocation(event.target.value as CaptionLocation)
+          }
+          className="border-input bg-background rounded-md border px-2 py-1 text-xs"
+        >
+          {LOCATION_DETAILS.map((detail) => (
+            <option key={detail.id} value={detail.id}>
+              {detail.label}
+            </option>
           ))}
-        </div>
+          <option value="neighborhood" disabled>
+            Neighborhood (offline N/A)
+          </option>
+        </select>
       </div>
       <div className="flex items-center gap-1.5">
         <label
