@@ -9,6 +9,7 @@ import {
   cropMarks,
   sheetLayout,
 } from '@/lib/layout'
+import { paginate } from '@/lib/pages'
 import { embedCaptionFont } from '@/lib/pdf-fonts'
 import { type Photo } from '@/lib/photos'
 
@@ -65,6 +66,7 @@ export async function buildSheetPdf(
   showCameraLine: boolean,
   paper: PaperSize,
   shape: Orientation,
+  pageShapes: Orientation[],
   borderColor: string,
   borderWidth: number,
   captionFontId: string,
@@ -75,16 +77,10 @@ export async function buildSheetPdf(
   const font =
     (await embedCaptionFont(doc, captionFontId)) ??
     (await doc.embedFont(StandardFonts.Helvetica))
-  const layout = sheetLayout(perRow, paper, shape, borderWidth)
-  const aspect = orientationAspect(shape)
-  const border = hexToRgb01(borderColor)
-  const ink = captionColors(borderColor)
-  const inkTop = hexToRgb01(ink.top)
-  const inkBottom = hexToRgb01(ink.bottom)
-  const inkCamera = hexToRgb01(ink.camera)
+  const pages = paginate(photos, perRow, paper, shape, pageShapes, borderWidth)
   const pageW = paper.widthMm * PT_PER_MM
   const pageH = paper.heightMm * PT_PER_MM
-  const margin = layout.marginMm * PT_PER_MM
+  const margin = paper.marginMm * PT_PER_MM
   const centerX = (text: string, size: number, cx: number) =>
     cx - font.widthOfTextAtSize(text, size) / 2
   const fitText = (text: string, size: number, maxWidth: number) => {
@@ -98,7 +94,9 @@ export async function buildSheetPdf(
     return `${trimmed}…`
   }
 
-  for (let start = 0; start < photos.length; start += layout.capacity) {
+  for (const sheet of pages) {
+    const layout = sheetLayout(perRow, paper, sheet.shape, borderWidth)
+    const aspect = orientationAspect(sheet.shape)
     const page = doc.addPage([pageW, pageH])
     page.drawRectangle({
       x: margin,
@@ -110,9 +108,8 @@ export async function buildSheetPdf(
       borderDashArray: [3, 3],
     })
 
-    const slice = photos.slice(start, start + layout.capacity)
-    for (let i = 0; i < slice.length; i++) {
-      const photo = slice[i]
+    for (let i = 0; i < sheet.photos.length; i++) {
+      const photo = sheet.photos[i]
       const r = layout.rectFor(i)
       if (cutMarks) {
         for (const seg of cropMarks(r)) {
@@ -131,6 +128,12 @@ export async function buildSheetPdf(
       const pad = w * borderWidth
       const imgW = w - pad * 2
       const imgH = imgW / aspect
+      const frameColor = photo.borderColor ?? borderColor
+      const border = hexToRgb01(frameColor)
+      const ink = captionColors(frameColor)
+      const inkTop = hexToRgb01(ink.top)
+      const inkBottom = hexToRgb01(ink.bottom)
+      const inkCamera = hexToRgb01(ink.camera)
 
       page.drawRectangle({
         x,
@@ -208,6 +211,7 @@ export async function downloadSheetPdf(
   showCameraLine: boolean,
   paper: PaperSize,
   shape: Orientation,
+  pageShapes: Orientation[],
   borderColor: string,
   borderWidth: number,
   captionFontId: string,
@@ -221,6 +225,7 @@ export async function downloadSheetPdf(
     showCameraLine,
     paper,
     shape,
+    pageShapes,
     borderColor,
     borderWidth,
     captionFontId,
