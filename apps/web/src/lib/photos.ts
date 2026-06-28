@@ -17,6 +17,10 @@ export interface Photo {
   captionBottom: string
   /** Place resolved from EXIF GPS — kept so the city/country toggle can switch. */
   place?: { city: string; country: string }
+  /** Capture time (epoch ms) from EXIF — kept so the date format can switch. */
+  takenAt?: number
+  /** Camera/lens/exposure summary from EXIF, shown as an optional caption line. */
+  cameraLine?: string
   /** How the photo is framed inside its window (pan + zoom). */
   crop: Crop
   /** Shape of the photo window (square / portrait / landscape). */

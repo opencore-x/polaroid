@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 
 import { type Crop, type Orientation, orientationFor } from '@/lib/crop'
-import { formatCaptionDate } from '@/lib/date'
+import { type DateFormat, formatCaptionDate, isAutoDate } from '@/lib/date'
 import { readExif } from '@/lib/exif'
 import { reverseGeocode } from '@/lib/geocode'
 import {
@@ -27,6 +27,8 @@ interface PhotoState {
   reorder: (activeId: string, overId: string) => void
   /** Re-derives auto location captions when the city/country mode changes. */
   applyLocationMode: (mode: CaptionLocation) => void
+  /** Re-derives auto date captions when the date format changes. */
+  applyDateFormat: (format: DateFormat) => void
   remove: (id: string) => void
   clear: () => void
 }
@@ -57,28 +59,40 @@ export const usePhotoStore = create<PhotoState>((set) => {
   async function enrich(photo: Photo) {
     void autoOrient(photo)
     try {
+      const settings = useSettingsStore.getState()
       const exif = await readExif(photo.file)
       const next: {
         captionTop?: string
         captionBottom?: string
         place?: { city: string; country: string }
-      } = {}
-      if (exif.takenAt) next.captionBottom = formatCaptionDate(exif.takenAt)
+        takenAt?: number
+        cameraLine?: string
+      } = { cameraLine: exif.cameraLine }
+      if (exif.takenAt) {
+        next.takenAt = exif.takenAt.getTime()
+        next.captionBottom = formatCaptionDate(exif.takenAt, settings.dateFormat)
+      }
       if (exif.latitude != null && exif.longitude != null) {
         const place = await reverseGeocode(exif.latitude, exif.longitude)
         if (place) {
           next.place = { city: place.city, country: place.country }
-          next.captionTop =
-            next.place[useSettingsStore.getState().captionLocation]
+          next.captionTop = next.place[settings.captionLocation]
         }
       }
-      if (next.captionTop || next.captionBottom || next.place) {
+      if (
+        next.captionTop ||
+        next.captionBottom ||
+        next.place ||
+        next.cameraLine
+      ) {
         set((state) => ({
           photos: state.photos.map((p) =>
             p.id === photo.id
               ? {
                   ...p,
                   place: p.place ?? next.place,
+                  takenAt: p.takenAt ?? next.takenAt,
+                  cameraLine: p.cameraLine ?? next.cameraLine,
                   captionTop: p.captionTop || next.captionTop || '',
                   captionBottom: p.captionBottom || next.captionBottom || '',
                 }
@@ -142,6 +156,17 @@ export const usePhotoStore = create<PhotoState>((set) => {
             p.captionTop === p.place.country
           return isAuto ? { ...p, captionTop: p.place[mode] } : p
         }),
+      })),
+    applyDateFormat: (format) =>
+      set((state) => ({
+        photos: state.photos.map((p) =>
+          p.takenAt != null && isAutoDate(p.captionBottom, p.takenAt)
+            ? {
+                ...p,
+                captionBottom: formatCaptionDate(new Date(p.takenAt), format),
+              }
+            : p,
+        ),
       })),
     remove: (id) =>
       set((state) => {
