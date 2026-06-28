@@ -11,6 +11,7 @@ export function SheetPage({
   fontStack,
   showCutMarks,
   showCaptions,
+  showCameraLine,
 }: {
   photos: Photo[]
   width: number
@@ -19,6 +20,7 @@ export function SheetPage({
   fontStack: string
   showCutMarks: boolean
   showCaptions: boolean
+  showCameraLine: boolean
 }) {
   const layout = sheetLayout(perRow, paper)
   const mmToPx = width / paper.widthMm
@@ -52,6 +54,7 @@ export function SheetPage({
                 width={rect.width * mmToPx}
                 fontStack={fontStack}
                 showCaptions={showCaptions}
+                showCameraLine={showCameraLine}
               />
             </div>
           )

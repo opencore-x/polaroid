@@ -16,6 +16,7 @@ export function A4Preview() {
   const perRow = useSettingsStore((state) => state.polaroidsPerRow)
   const showCutMarks = useSettingsStore((state) => state.showCutMarks)
   const showCaptions = useSettingsStore((state) => state.showCaptions)
+  const showCameraLine = useSettingsStore((state) => state.showCameraLine)
   const fontStack = captionFontStack(captionFontId)
   const paper = paperSize(paperSizeId)
 
@@ -26,7 +27,14 @@ export function A4Preview() {
   const handleExport = async () => {
     setIsExporting(true)
     try {
-      await downloadSheetPdf(photos, perRow, showCutMarks, showCaptions, paper)
+      await downloadSheetPdf(
+        photos,
+        perRow,
+        showCutMarks,
+        showCaptions,
+        showCameraLine,
+        paper,
+      )
     } finally {
       setIsExporting(false)
     }
@@ -85,6 +93,7 @@ export function A4Preview() {
               fontStack={fontStack}
               showCutMarks={showCutMarks}
               showCaptions={showCaptions}
+              showCameraLine={showCameraLine}
             />
           </div>
         ))}

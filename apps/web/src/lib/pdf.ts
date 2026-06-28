@@ -60,6 +60,7 @@ export async function buildSheetPdf(
   perRow: number,
   cutMarks: boolean,
   showCaptions: boolean,
+  showCameraLine: boolean,
   paper: PaperSize,
 ): Promise<Uint8Array> {
   const doc = await PDFDocument.create()
@@ -70,6 +71,16 @@ export async function buildSheetPdf(
   const margin = layout.marginMm * PT_PER_MM
   const centerX = (text: string, size: number, cx: number) =>
     cx - font.widthOfTextAtSize(text, size) / 2
+  const fitText = (text: string, size: number, maxWidth: number) => {
+    if (font.widthOfTextAtSize(text, size) <= maxWidth) return text
+    let trimmed = text
+    while (
+      trimmed.length > 1 &&
+      font.widthOfTextAtSize(`${trimmed}…`, size) > maxWidth
+    )
+      trimmed = trimmed.slice(0, -1)
+    return `${trimmed}…`
+  }
 
   for (let start = 0; start < photos.length; start += layout.capacity) {
     const page = doc.addPage([pageW, pageH])
@@ -156,6 +167,17 @@ export async function buildSheetPdf(
           color: rgb(0.45, 0.45, 0.45),
         })
       }
+      if (showCaptions && showCameraLine && photo.cameraLine) {
+        const camSize = w * 0.045
+        const line = fitText(photo.cameraLine, camSize, w - pad * 2)
+        page.drawText(line, {
+          x: centerX(line, camSize, cx),
+          y: capY - topSize - botSize - 2 - camSize - 1.5,
+          size: camSize,
+          font,
+          color: rgb(0.64, 0.64, 0.64),
+        })
+      }
     }
   }
 
@@ -167,6 +189,7 @@ export async function downloadSheetPdf(
   perRow: number,
   cutMarks: boolean,
   showCaptions: boolean,
+  showCameraLine: boolean,
   paper: PaperSize,
   filename = 'polaroids.pdf',
 ): Promise<void> {
@@ -175,6 +198,7 @@ export async function downloadSheetPdf(
     perRow,
     cutMarks,
     showCaptions,
+    showCameraLine,
     paper,
   )
   const blob = new Blob([bytes as BlobPart], { type: 'application/pdf' })
