@@ -1,6 +1,12 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
 
-import { A4_MM, POLAROID, PT_PER_MM, cropMarks, sheetLayout } from '@/lib/layout'
+import {
+  type PaperSize,
+  POLAROID,
+  PT_PER_MM,
+  cropMarks,
+  sheetLayout,
+} from '@/lib/layout'
 import { type Photo } from '@/lib/photos'
 
 const IMAGE_DPI = 300
@@ -41,18 +47,19 @@ async function rasterizeSquareJpeg(
   return new Uint8Array(await blob.arrayBuffer())
 }
 
-/** Builds an A4, sRGB, print-ready PDF of all photos (paginated). */
+/** Builds a paginated, sRGB, print-ready PDF of all photos on the given stock. */
 export async function buildSheetPdf(
   photos: Photo[],
   perRow: number,
   cutMarks: boolean,
   showCaptions: boolean,
+  paper: PaperSize,
 ): Promise<Uint8Array> {
   const doc = await PDFDocument.create()
   const font = await doc.embedFont(StandardFonts.Helvetica)
-  const layout = sheetLayout(perRow)
-  const pageW = A4_MM.width * PT_PER_MM
-  const pageH = A4_MM.height * PT_PER_MM
+  const layout = sheetLayout(perRow, paper)
+  const pageW = paper.widthMm * PT_PER_MM
+  const pageH = paper.heightMm * PT_PER_MM
   const margin = layout.marginMm * PT_PER_MM
   const centerX = (text: string, size: number, cx: number) =>
     cx - font.widthOfTextAtSize(text, size) / 2
@@ -145,9 +152,16 @@ export async function downloadSheetPdf(
   perRow: number,
   cutMarks: boolean,
   showCaptions: boolean,
+  paper: PaperSize,
   filename = 'polaroids.pdf',
 ): Promise<void> {
-  const bytes = await buildSheetPdf(photos, perRow, cutMarks, showCaptions)
+  const bytes = await buildSheetPdf(
+    photos,
+    perRow,
+    cutMarks,
+    showCaptions,
+    paper,
+  )
   const blob = new Blob([bytes as BlobPart], { type: 'application/pdf' })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
