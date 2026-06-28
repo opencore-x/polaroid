@@ -1,5 +1,6 @@
 import { X } from 'lucide-react'
 
+import { CaptionFontControl } from '@/components/caption-font-control'
 import { FrameControls } from '@/components/frame-controls'
 import { Polaroid } from '@/components/polaroid'
 import { Button } from '@/components/ui/button'
@@ -18,7 +19,8 @@ export function PhotoGrid() {
         <h2 className="text-sm font-medium">
           {photos.length} {photos.length === 1 ? 'photo' : 'photos'}
         </h2>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <CaptionFontControl />
           <FrameControls />
           <Button variant="ghost" size="sm" onClick={clear}>
             Clear all
