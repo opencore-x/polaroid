@@ -9,6 +9,10 @@ import {
   createPhoto,
   isImageFile,
 } from '@/lib/photos'
+import {
+  type CaptionLocation,
+  useSettingsStore,
+} from '@/stores/settings-store'
 
 interface PhotoState {
   photos: Photo[]
@@ -17,6 +21,8 @@ interface PhotoState {
   setCaption: (id: string, field: CaptionField, value: string) => void
   /** Moves the photo with `activeId` to the position of `overId`. */
   reorder: (activeId: string, overId: string) => void
+  /** Re-derives auto location captions when the city/country mode changes. */
+  applyLocationMode: (mode: CaptionLocation) => void
   remove: (id: string) => void
   clear: () => void
 }
@@ -27,18 +33,26 @@ export const usePhotoStore = create<PhotoState>((set) => {
   // has already typed.
   async function enrich(photo: Photo) {
     const exif = await readExif(photo.file)
-    const next: { captionTop?: string; captionBottom?: string } = {}
+    const next: {
+      captionTop?: string
+      captionBottom?: string
+      place?: { city: string; country: string }
+    } = {}
     if (exif.takenAt) next.captionBottom = formatCaptionDate(exif.takenAt)
     if (exif.latitude != null && exif.longitude != null) {
       const place = await reverseGeocode(exif.latitude, exif.longitude)
-      if (place) next.captionTop = place.city
+      if (place) {
+        next.place = { city: place.city, country: place.country }
+        next.captionTop = next.place[useSettingsStore.getState().captionLocation]
+      }
     }
-    if (!next.captionTop && !next.captionBottom) return
+    if (!next.captionTop && !next.captionBottom && !next.place) return
     set((state) => ({
       photos: state.photos.map((p) =>
         p.id === photo.id
           ? {
               ...p,
+              place: p.place ?? next.place,
               captionTop: p.captionTop || next.captionTop || '',
               captionBottom: p.captionBottom || next.captionBottom || '',
             }
@@ -72,6 +86,17 @@ export const usePhotoStore = create<PhotoState>((set) => {
         photos.splice(to, 0, moved)
         return { photos }
       }),
+    applyLocationMode: (mode) =>
+      set((state) => ({
+        photos: state.photos.map((p) => {
+          if (!p.place) return p
+          const isAuto =
+            p.captionTop === '' ||
+            p.captionTop === p.place.city ||
+            p.captionTop === p.place.country
+          return isAuto ? { ...p, captionTop: p.place[mode] } : p
+        }),
+      })),
     remove: (id) =>
       set((state) => {
         const target = state.photos.find((photo) => photo.id === id)
