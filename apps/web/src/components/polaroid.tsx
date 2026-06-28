@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ImageOff } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
+import { captionFontStack } from '@/lib/fonts'
 import { type Photo } from '@/lib/photos'
 import { usePhotoStore } from '@/stores/photo-store'
 import { useSettingsStore } from '@/stores/settings-store'
@@ -9,6 +10,8 @@ import { useSettingsStore } from '@/stores/settings-store'
 export function Polaroid({ photo }: { photo: Photo }) {
   const setCaption = usePhotoStore((state) => state.setCaption)
   const framePadding = useSettingsStore((state) => state.framePadding)
+  const captionFontId = useSettingsStore((state) => state.captionFontId)
+  const fontFamily = captionFontStack(captionFontId)
   const [failed, setFailed] = useState(false)
 
   return (
@@ -43,11 +46,13 @@ export function Polaroid({ photo }: { photo: Photo }) {
           value={photo.captionTop}
           onChange={(value) => setCaption(photo.id, 'captionTop', value)}
           placeholder="Add a caption"
+          fontFamily={fontFamily}
           className="text-lg leading-tight"
         />
         <CaptionInput
           value={photo.captionBottom}
           onChange={(value) => setCaption(photo.id, 'captionBottom', value)}
+          fontFamily={fontFamily}
           className="text-sm text-neutral-500"
         />
       </div>
@@ -60,11 +65,13 @@ function CaptionInput({
   onChange,
   placeholder,
   className,
+  fontFamily,
 }: {
   value: string
   onChange: (value: string) => void
   placeholder?: string
   className?: string
+  fontFamily: string
 }) {
   return (
     <input
@@ -73,8 +80,9 @@ function CaptionInput({
       onChange={(event) => onChange(event.target.value)}
       placeholder={placeholder}
       aria-label="Polaroid caption"
+      style={{ fontFamily }}
       className={cn(
-        'font-handwriting w-full border-0 bg-transparent text-center text-neutral-800 placeholder:text-neutral-300 focus:outline-none',
+        'w-full border-0 bg-transparent text-center text-neutral-800 placeholder:text-neutral-300 focus:outline-none',
         className,
       )}
     />
