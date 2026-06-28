@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 
+import { type Orientation, DEFAULT_ORIENTATION } from '@/lib/crop'
 import { type DateFormat, DEFAULT_DATE_FORMAT } from '@/lib/date'
 import { DEFAULT_CAPTION_FONT_ID } from '@/lib/fonts'
 import { type LocationDetail } from '@/lib/geocode'
@@ -16,6 +17,7 @@ export type CaptionLocation = LocationDetail
 /** The persistable subset of settings (no action functions). */
 export interface SettingsSnapshot {
   framePadding: number
+  frameShape: Orientation
   captionFontId: string
   paperSizeId: string
   polaroidsPerRow: number
@@ -36,6 +38,7 @@ export function settingsSnapshot(state: SettingsState): SettingsSnapshot {
 
 export const PERSISTED_SETTINGS_KEYS: (keyof SettingsSnapshot)[] = [
   'framePadding',
+  'frameShape',
   'captionFontId',
   'paperSizeId',
   'polaroidsPerRow',
@@ -50,6 +53,9 @@ interface SettingsState {
   /** White polaroid border width in px (sides/top); the bottom is thicker. */
   framePadding: number
   setFramePadding: (px: number) => void
+  /** Frame shape for the whole sheet — the photo covers a box of this aspect. */
+  frameShape: Orientation
+  setFrameShape: (shape: Orientation) => void
   captionFontId: string
   setCaptionFont: (id: string) => void
   /** Selected print stock (A4, Letter, 4×6, …). */
@@ -78,6 +84,8 @@ interface SettingsState {
 export const useSettingsStore = create<SettingsState>((set) => ({
   framePadding: 14,
   setFramePadding: (px) => set({ framePadding: px }),
+  frameShape: DEFAULT_ORIENTATION,
+  setFrameShape: (shape) => set({ frameShape: shape }),
   captionFontId: DEFAULT_CAPTION_FONT_ID,
   setCaptionFont: (id) => set({ captionFontId: id }),
   paperSizeId: DEFAULT_PAPER_SIZE_ID,

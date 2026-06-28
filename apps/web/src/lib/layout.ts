@@ -1,3 +1,5 @@
+import { type Orientation, orientationAspect } from '@/lib/crop'
+
 export const PT_PER_MM = 72 / 25.4
 
 export interface PaperSize {
@@ -29,10 +31,29 @@ export function paperSize(id: string): PaperSize {
 // Polaroid proportions, expressed as ratios of the polaroid's width so the same
 // numbers drive the on-screen preview (px) and the exported PDF (pt).
 export const POLAROID = {
-  aspect: 1.2, // height / width
-  framePad: 0.05, // white border on sides + top
+  framePad: 0.05, // even white border on the sides + top
+  captionBand: 0.25, // thicker bottom band that holds the captions
   captionTopSize: 0.1, // city line font size
   captionBottomSize: 0.075, // date line font size
+}
+
+/** Frame shapes offered to the user (reusing the Orientation aspects). */
+export const FRAME_SHAPES: { id: Orientation; label: string }[] = [
+  { id: 'square', label: 'Square' },
+  { id: 'portrait', label: 'Tall' },
+  { id: 'landscape', label: 'Wide' },
+]
+
+/**
+ * Card height ÷ width for a shape: an even border around a photo box whose
+ * aspect follows the shape, plus the thicker caption band at the bottom.
+ */
+export function cardAspect(shape: Orientation): number {
+  return (
+    POLAROID.framePad +
+    (1 - POLAROID.framePad * 2) / orientationAspect(shape) +
+    POLAROID.captionBand
+  )
 }
 
 export interface Rect {
@@ -86,13 +107,14 @@ export interface SheetLayout {
 export function sheetLayout(
   perRow: number,
   paper: PaperSize,
+  shape: Orientation = 'square',
   gapMm = 4,
 ): SheetLayout {
   const marginMm = paper.marginMm
   const usableW = paper.widthMm - marginMm * 2
   const usableH = paper.heightMm - marginMm * 2
   const cellWidthMm = (usableW - gapMm * (perRow - 1)) / perRow
-  const cellHeightMm = cellWidthMm * POLAROID.aspect
+  const cellHeightMm = cellWidthMm * cardAspect(shape)
   const rows = Math.max(1, Math.floor((usableH + gapMm) / (cellHeightMm + gapMm)))
   const capacity = perRow * rows
 
