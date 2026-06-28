@@ -1,5 +1,6 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
 
+import { type Crop, cropSource } from '@/lib/crop'
 import {
   type PaperSize,
   POLAROID,
@@ -21,13 +22,15 @@ function loadImage(url: string): Promise<HTMLImageElement | null> {
 }
 
 /**
- * Draws a centre-cropped square of the photo onto a canvas and returns sRGB
- * JPEG bytes. Canvas output is always sRGB — exactly what photo labs and home
+ * Draws the cropped square of the photo onto a canvas and returns sRGB JPEG
+ * bytes. The sampled region comes from `cropSource`, so it matches the on-screen
+ * framing exactly. Canvas output is always sRGB — what photo labs and home
  * inkjets want (see README). Handles any format the browser can decode.
  */
 async function rasterizeSquareJpeg(
   url: string,
   sizePx: number,
+  crop: Crop,
 ): Promise<Uint8Array | null> {
   const img = await loadImage(url)
   if (!img) return null
@@ -36,9 +39,7 @@ async function rasterizeSquareJpeg(
   canvas.height = sizePx
   const ctx = canvas.getContext('2d')
   if (!ctx) return null
-  const side = Math.min(img.naturalWidth, img.naturalHeight)
-  const sx = (img.naturalWidth - side) / 2
-  const sy = (img.naturalHeight - side) / 2
+  const { sx, sy, side } = cropSource(img.naturalWidth, img.naturalHeight, crop)
   ctx.drawImage(img, sx, sy, side, side, 0, 0, sizePx, sizePx)
   const blob = await new Promise<Blob | null>((resolve) =>
     canvas.toBlob(resolve, 'image/jpeg', 0.92),
@@ -108,7 +109,7 @@ export async function buildSheetPdf(
       })
 
       const imgPx = Math.round((imgSize / PT_PER_MM) * (IMAGE_DPI / 25.4))
-      const jpeg = await rasterizeSquareJpeg(photo.url, imgPx)
+      const jpeg = await rasterizeSquareJpeg(photo.url, imgPx, photo.crop)
       if (jpeg) {
         const embedded = await doc.embedJpg(jpeg)
         page.drawImage(embedded, {
