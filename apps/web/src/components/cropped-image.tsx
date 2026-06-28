@@ -1,14 +1,15 @@
 import { type PointerEvent, type WheelEvent, useRef, useState } from 'react'
 import { ImageOff } from 'lucide-react'
 
-import { type Crop, clampCrop, coverStyle } from '@/lib/crop'
+import { type Crop, clampCrop, coverStyle, cropSource } from '@/lib/crop'
 import { cn } from '@/lib/utils'
 
 interface DragStart {
   pointerX: number
   pointerY: number
   crop: Crop
-  frame: number
+  frameW: number
+  frameH: number
 }
 
 /**
@@ -21,12 +22,17 @@ export function CroppedImage({
   src,
   alt,
   crop,
+  aspect = 1,
   onCropChange,
+  onNaturalSize,
 }: {
   src: string
   alt: string
   crop: Crop
+  /** Window aspect ratio (width / height). */
+  aspect?: number
   onCropChange?: (crop: Crop) => void
+  onNaturalSize?: (size: { w: number; h: number }) => void
 }) {
   const [natural, setNatural] = useState<{ w: number; h: number } | null>(null)
   const [failed, setFailed] = useState(false)
@@ -42,16 +48,20 @@ export function CroppedImage({
     )
   }
 
-  const placed = natural ? coverStyle(natural.w, natural.h, crop) : undefined
+  const placed = natural
+    ? coverStyle(natural.w, natural.h, crop, aspect)
+    : undefined
 
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
     if (!editable || !natural) return
     event.stopPropagation()
+    const rect = event.currentTarget.getBoundingClientRect()
     drag.current = {
       pointerX: event.clientX,
       pointerY: event.clientY,
       crop,
-      frame: event.currentTarget.getBoundingClientRect().width,
+      frameW: rect.width,
+      frameH: rect.height,
     }
     event.currentTarget.setPointerCapture(event.pointerId)
   }
@@ -59,13 +69,13 @@ export function CroppedImage({
   const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
     const start = drag.current
     if (!start || !natural || !onCropChange) return
-    const side = Math.min(natural.w, natural.h) / start.crop.scale
-    const dx = (event.clientX - start.pointerX) / start.frame
-    const dy = (event.clientY - start.pointerY) / start.frame
+    const { sw, sh } = cropSource(natural.w, natural.h, start.crop, aspect)
+    const dx = (event.clientX - start.pointerX) / start.frameW
+    const dy = (event.clientY - start.pointerY) / start.frameH
     onCropChange(
       clampCrop({
-        x: start.crop.x - dx * (side / natural.w),
-        y: start.crop.y - dy * (side / natural.h),
+        x: start.crop.x - dx * (sw / natural.w),
+        y: start.crop.y - dy * (sh / natural.h),
         scale: start.crop.scale,
       }),
     )
@@ -106,12 +116,14 @@ export function CroppedImage({
         alt={alt}
         draggable={false}
         loading="lazy"
-        onLoad={(event) =>
-          setNatural({
+        onLoad={(event) => {
+          const size = {
             w: event.currentTarget.naturalWidth,
             h: event.currentTarget.naturalHeight,
-          })
-        }
+          }
+          setNatural(size)
+          onNaturalSize?.(size)
+        }}
         onError={() => setFailed(true)}
         className={cn(
           'pointer-events-none select-none',
