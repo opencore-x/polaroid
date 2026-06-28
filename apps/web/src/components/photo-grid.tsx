@@ -101,7 +101,7 @@ function PhotoTile({ photo }: { photo: Photo }) {
         {...attributes}
         {...listeners}
         aria-label={`Drag ${photo.name} to reorder`}
-        className="bg-secondary text-secondary-foreground absolute top-1.5 left-1.5 flex size-7 cursor-grab touch-none items-center justify-center rounded-md opacity-0 shadow-sm transition-opacity group-hover:opacity-100 focus-visible:opacity-100 active:cursor-grabbing"
+        className="bg-secondary text-secondary-foreground absolute top-1.5 left-1.5 flex size-7 cursor-grab touch-none items-center justify-center rounded-md opacity-100 shadow-sm transition-opacity sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 active:cursor-grabbing"
       >
         <GripVertical className="size-4" />
       </button>
@@ -111,7 +111,7 @@ function PhotoTile({ photo }: { photo: Photo }) {
         size="icon"
         aria-label={`Remove ${photo.name}`}
         onClick={() => remove(photo.id)}
-        className="absolute top-1.5 right-1.5 size-7 opacity-0 shadow-sm transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+        className="absolute top-1.5 right-1.5 size-7 opacity-100 shadow-sm transition-opacity sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100"
       >
         <X />
       </Button>
