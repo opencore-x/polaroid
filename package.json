@@ -1,0 +1,27 @@
+{
+  "name": "polaroid",
+  "private": true,
+  "packageManager": "pnpm@10.28.1",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "format": "prettier --write \"**/*.{ts,tsx,css,md,json,yaml,yml}\""
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "@tailwindcss/oxide",
+      "@parcel/watcher",
+      "unrs-resolver"
+    ]
+  },
+  "devDependencies": {
+    "prettier": "^3.9.1",
+    "turbo": "^2.10.0"
+  }
+}
