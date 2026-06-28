@@ -7,6 +7,11 @@ import {
 
 import { SheetInspector } from '@/components/sheet-inspector'
 import { SheetPage } from '@/components/sheet-page'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { type Orientation } from '@/lib/crop'
 import { captionFontStack } from '@/lib/fonts'
 import { FRAME_SHAPES, paperSize } from '@/lib/layout'
@@ -112,19 +117,23 @@ function PageShapeToggle({
         const Icon = SHAPE_ICONS[id]
         const active = value === id
         return (
-          <button
-            key={id}
-            type="button"
-            aria-label={`${label} frames on this page`}
-            aria-pressed={active}
-            onClick={() => onChange(id)}
-            className={cn(
-              'flex size-6 items-center justify-center rounded text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700',
-              active && 'bg-neutral-200 text-neutral-900',
-            )}
-          >
-            <Icon className="size-3.5" />
-          </button>
+          <Tooltip key={id}>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                aria-label={`${label} frames on this page`}
+                aria-pressed={active}
+                onClick={() => onChange(id)}
+                className={cn(
+                  'text-muted-foreground hover:bg-accent hover:text-foreground flex size-6 items-center justify-center rounded',
+                  active && 'bg-accent text-foreground',
+                )}
+              >
+                <Icon className="size-3.5" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>{label} frames on this page</TooltipContent>
+          </Tooltip>
         )
       })}
     </div>
