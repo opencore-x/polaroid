@@ -7,9 +7,10 @@ import patrickHandUrl from '@/fonts/PatrickHand-Regular.ttf?url'
 import shadowsUrl from '@/fonts/ShadowsIntoLight-Regular.ttf?url'
 
 // Static TTFs for the handwriting caption fonts, so the exported PDF matches the
-// on-screen preview. Only fonts that render faithfully in pdf-lib (which has no
-// GPOS kerning) are offered — Caveat, a connected script, was dropped for this
-// reason (see #23).
+// on-screen preview. We embed the FULL font (no subsetting): pdf-lib's subsetter
+// drops glyphs for some of these — Kalam came out as scattered half-words — and
+// the size cost is trivial next to the 300-DPI photos. Connected scripts that
+// rely on GPOS kerning pdf-lib lacks (e.g. Caveat) are still excluded (see #23).
 const PDF_FONT_URLS: Record<string, string> = {
   'indie-flower': indieFlowerUrl,
   'patrick-hand': patrickHandUrl,
@@ -40,7 +41,7 @@ export async function embedCaptionFont(
   if (!url) return null
   try {
     doc.registerFontkit(fontkit)
-    return await doc.embedFont(await fontBytes(url), { subset: true })
+    return await doc.embedFont(await fontBytes(url), { subset: false })
   } catch {
     return null
   }
