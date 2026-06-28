@@ -1,6 +1,5 @@
-import { useState } from 'react'
-import { ImageOff } from 'lucide-react'
-
+import { CroppedImage } from '@/components/cropped-image'
+import { MAX_CROP_SCALE, MIN_CROP_SCALE } from '@/lib/crop'
 import { cn } from '@/lib/utils'
 import { captionFontStack } from '@/lib/fonts'
 import { type Photo } from '@/lib/photos'
@@ -9,11 +8,11 @@ import { useSettingsStore } from '@/stores/settings-store'
 
 export function Polaroid({ photo }: { photo: Photo }) {
   const setCaption = usePhotoStore((state) => state.setCaption)
+  const setCrop = usePhotoStore((state) => state.setCrop)
   const framePadding = useSettingsStore((state) => state.framePadding)
   const captionFontId = useSettingsStore((state) => state.captionFontId)
   const showCaptions = useSettingsStore((state) => state.showCaptions)
   const fontFamily = captionFontStack(captionFontId)
-  const [failed, setFailed] = useState(false)
 
   return (
     <div
@@ -21,21 +20,25 @@ export function Polaroid({ photo }: { photo: Photo }) {
       style={{ padding: framePadding, paddingBottom: 0 }}
     >
       <div className="aspect-square overflow-hidden bg-neutral-200">
-        {failed ? (
-          <div className="flex h-full flex-col items-center justify-center gap-1 text-neutral-400">
-            <ImageOff className="size-6" />
-            <span className="text-[10px]">Preview unavailable</span>
-          </div>
-        ) : (
-          <img
-            src={photo.url}
-            alt={photo.name}
-            loading="lazy"
-            onError={() => setFailed(true)}
-            className="h-full w-full object-cover"
-          />
-        )}
+        <CroppedImage
+          src={photo.url}
+          alt={photo.name}
+          crop={photo.crop}
+          onCropChange={(crop) => setCrop(photo.id, crop)}
+        />
       </div>
+      <input
+        type="range"
+        aria-label="Zoom photo"
+        min={MIN_CROP_SCALE}
+        max={MAX_CROP_SCALE}
+        step={0.01}
+        value={photo.crop.scale}
+        onChange={(event) =>
+          setCrop(photo.id, { ...photo.crop, scale: Number(event.target.value) })
+        }
+        className="accent-primary mt-1 w-full"
+      />
       <div
         className="flex flex-col items-center"
         style={{
