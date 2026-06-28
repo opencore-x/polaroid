@@ -2,6 +2,7 @@ import { create } from 'zustand'
 
 import { type DateFormat, DEFAULT_DATE_FORMAT } from '@/lib/date'
 import { DEFAULT_CAPTION_FONT_ID } from '@/lib/fonts'
+import { type LocationDetail } from '@/lib/geocode'
 import { DEFAULT_PAPER_SIZE_ID } from '@/lib/layout'
 
 export const MIN_FRAME_PADDING = 6
@@ -10,7 +11,7 @@ export const MAX_FRAME_PADDING = 28
 export const MIN_PER_ROW = 2
 export const MAX_PER_ROW = 5
 
-export type CaptionLocation = 'city' | 'country'
+export type CaptionLocation = LocationDetail
 
 /** The persistable subset of settings (no action functions). */
 export interface SettingsSnapshot {
