@@ -28,6 +28,7 @@ interface PhotoMeta {
   cameraLine?: string
   crop?: Crop
   orientation?: Orientation
+  borderColor?: string
   /** Position on the sheet; metas are sorted by this on load. */
   order: number
 }
@@ -107,6 +108,7 @@ export async function loadSession(): Promise<{
         cameraLine: meta.cameraLine,
         crop: meta.crop ?? DEFAULT_CROP,
         orientation: meta.orientation ?? DEFAULT_ORIENTATION,
+        borderColor: meta.borderColor,
         enriching: false,
       })
     }
@@ -149,6 +151,7 @@ export async function savePhotos(photos: Photo[]): Promise<void> {
         cameraLine: photo.cameraLine,
         crop: photo.crop,
         orientation: photo.orientation,
+        borderColor: photo.borderColor,
         order,
       }
       metaStore.put(meta, photo.id)
