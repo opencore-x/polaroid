@@ -37,7 +37,7 @@ export default defineConfig({
         // Precache the whole shell — including the JS chunk that embeds the
         // offline geocoding dataset and the bundled fonts — so the app works
         // with no network at all.
-        globPatterns: ['**/*.{js,css,html,svg,png,woff,woff2}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,woff,woff2,ttf}'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         cleanupOutdatedCaches: true,
       },
