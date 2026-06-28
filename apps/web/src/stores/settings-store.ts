@@ -26,6 +26,14 @@ export interface SettingsSnapshot {
   showCaptions: boolean
 }
 
+/** Extracts the persistable settings (no action functions) from store state. */
+export function settingsSnapshot(state: SettingsState): SettingsSnapshot {
+  return PERSISTED_SETTINGS_KEYS.reduce(
+    (snapshot, key) => ({ ...snapshot, [key]: state[key] }),
+    {} as SettingsSnapshot,
+  )
+}
+
 export const PERSISTED_SETTINGS_KEYS: (keyof SettingsSnapshot)[] = [
   'framePadding',
   'captionFontId',
