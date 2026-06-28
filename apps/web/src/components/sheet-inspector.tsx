@@ -1,4 +1,5 @@
 import {
+  Check,
   RectangleHorizontal,
   RectangleVertical,
   Square,
@@ -35,9 +36,9 @@ export function SheetInspector() {
   if (!photo) return null
 
   return (
-    <div className="border-input bg-card flex flex-wrap items-center gap-x-4 gap-y-2 rounded-md border p-2">
-      <span className="text-muted-foreground text-xs font-medium">
-        Drag the photo to reposition
+    <div className="border-input bg-card pointer-events-auto flex items-center gap-x-4 rounded-full border py-1.5 pr-1.5 pl-3 shadow-lg">
+      <span className="text-muted-foreground hidden text-xs font-medium sm:inline">
+        Drag to reposition
       </span>
       <div className="flex gap-0.5">
         {ORIENTATIONS.map((orientation) => {
@@ -80,21 +81,22 @@ export function SheetInspector() {
       </div>
       <button
         type="button"
+        aria-label="Remove photo"
         onClick={() => {
           select(null)
           remove(photo.id)
         }}
-        className="text-muted-foreground hover:text-destructive ml-auto flex items-center gap-1 text-xs"
+        className="text-muted-foreground hover:text-destructive hover:bg-neutral-100 ml-auto flex size-7 items-center justify-center rounded"
       >
-        <Trash2 className="size-3.5" />
-        Remove
+        <Trash2 className="size-4" />
       </button>
       <button
         type="button"
+        aria-label="Done"
         onClick={() => select(null)}
-        className="text-xs font-medium hover:underline"
+        className="text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 flex size-7 items-center justify-center rounded"
       >
-        Done
+        <Check className="size-4" />
       </button>
     </div>
   )
