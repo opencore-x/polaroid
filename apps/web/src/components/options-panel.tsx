@@ -2,6 +2,15 @@ import { type ReactNode, useState } from 'react'
 import { Minus, Plus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
 import { type Orientation } from '@/lib/crop'
 import { DATE_FORMATS, type DateFormat } from '@/lib/date'
 import { CAPTION_FONTS } from '@/lib/fonts'
@@ -23,9 +32,6 @@ import {
   MIN_PER_ROW,
   useSettingsStore,
 } from '@/stores/settings-store'
-
-const SELECT_CLASS =
-  'border-input bg-background rounded-md border px-2 py-1 text-sm'
 
 /** The right-hand rail: every caption + sheet option, plus export. */
 export function OptionsPanel() {
@@ -101,82 +107,77 @@ export function OptionsPanel() {
     <div className="border-input bg-card flex flex-col gap-5 rounded-lg border p-3">
       <Section title="Captions">
         <Field label="Location" htmlFor="opt-location">
-          <select
+          <FieldSelect
             id="opt-location"
-            className={SELECT_CLASS}
             value={captionLocation}
-            onChange={(event) =>
-              selectLocation(event.target.value as CaptionLocation)
-            }
+            onChange={(value) => selectLocation(value as CaptionLocation)}
           >
             {LOCATION_DETAILS.map((detail) => (
-              <option key={detail.id} value={detail.id}>
+              <SelectItem key={detail.id} value={detail.id}>
                 {detail.label}
-              </option>
+              </SelectItem>
             ))}
-            <option value="neighborhood" disabled>
+            <SelectItem value="neighborhood" disabled>
               Neighborhood (offline N/A)
-            </option>
-          </select>
+            </SelectItem>
+          </FieldSelect>
         </Field>
         <Field label="Date" htmlFor="opt-date">
-          <select
+          <FieldSelect
             id="opt-date"
-            className={SELECT_CLASS}
             value={dateFormat}
-            onChange={(event) => selectDate(event.target.value as DateFormat)}
+            onChange={(value) => selectDate(value as DateFormat)}
           >
             {DATE_FORMATS.map((format) => (
-              <option key={format.id} value={format.id}>
+              <SelectItem key={format.id} value={format.id}>
                 {format.label}
-              </option>
+              </SelectItem>
             ))}
-          </select>
+          </FieldSelect>
         </Field>
         <Field label="Font" htmlFor="opt-font">
-          <select
-            id="opt-font"
-            className={SELECT_CLASS}
-            value={captionFontId}
-            onChange={(event) => setCaptionFont(event.target.value)}
-          >
+          <FieldSelect id="opt-font" value={captionFontId} onChange={setCaptionFont}>
             {CAPTION_FONTS.map((font) => (
-              <option key={font.id} value={font.id} style={{ fontFamily: font.stack }}>
+              <SelectItem
+                key={font.id}
+                value={font.id}
+                style={{ fontFamily: font.stack }}
+              >
                 {font.label}
-              </option>
+              </SelectItem>
             ))}
-          </select>
+          </FieldSelect>
         </Field>
-        <Toggle
+        <SettingSwitch
           label="Camera info"
           checked={showCameraLine}
           onChange={setShowCameraLine}
         />
-        <Toggle label="Captions" checked={showCaptions} onChange={setShowCaptions} />
+        <SettingSwitch
+          label="Captions"
+          checked={showCaptions}
+          onChange={setShowCaptions}
+        />
       </Section>
 
       <Section title="Sheet">
         <Field label="Frame" htmlFor="opt-shape">
-          <select
+          <FieldSelect
             id="opt-shape"
-            className={SELECT_CLASS}
             value={uniformShape ?? 'mixed'}
-            onChange={(event) => {
-              if (event.target.value !== 'mixed')
-                setFrameShapeAll(event.target.value as Orientation)
-            }}
+            onChange={(value) => setFrameShapeAll(value as Orientation)}
           >
             {!uniformShape && (
-              <option value="mixed" disabled>
+              <SelectItem value="mixed" disabled>
                 Mixed
-              </option>
+              </SelectItem>
             )}
             {FRAME_SHAPES.map((option) => (
-              <option key={option.id} value={option.id}>
+              <SelectItem key={option.id} value={option.id}>
                 {option.label}
-              </option>
+              </SelectItem>
             ))}
-          </select>
+          </FieldSelect>
         </Field>
         <Field label="Border" htmlFor="opt-border">
           <span className="flex items-center gap-1">
@@ -214,32 +215,26 @@ export function OptionsPanel() {
           </span>
         </Field>
         <Field label="Thickness" htmlFor="opt-thickness">
-          <select
+          <FieldSelect
             id="opt-thickness"
-            className={SELECT_CLASS}
-            value={borderWidth}
-            onChange={(event) => setBorderWidth(Number(event.target.value))}
+            value={String(borderWidth)}
+            onChange={(value) => setBorderWidth(Number(value))}
           >
             {BORDER_WIDTHS.map((option) => (
-              <option key={option.label} value={option.ratio}>
+              <SelectItem key={option.label} value={String(option.ratio)}>
                 {option.label}
-              </option>
+              </SelectItem>
             ))}
-          </select>
+          </FieldSelect>
         </Field>
         <Field label="Paper" htmlFor="opt-paper">
-          <select
-            id="opt-paper"
-            className={SELECT_CLASS}
-            value={paperSizeId}
-            onChange={(event) => setPaperSize(event.target.value)}
-          >
+          <FieldSelect id="opt-paper" value={paperSizeId} onChange={setPaperSize}>
             {PAPER_SIZES.map((size) => (
-              <option key={size.id} value={size.id}>
+              <SelectItem key={size.id} value={size.id}>
                 {size.label}
-              </option>
+              </SelectItem>
             ))}
-          </select>
+          </FieldSelect>
         </Field>
         <Field label="Per row" htmlFor="opt-perrow">
           <Stepper
@@ -249,7 +244,7 @@ export function OptionsPanel() {
             onChange={setPerRow}
           />
         </Field>
-        <Toggle
+        <SettingSwitch
           label="Cut marks"
           checked={showCutMarks}
           onChange={setShowCutMarks}
@@ -264,6 +259,27 @@ export function OptionsPanel() {
         {isExporting ? 'Preparing…' : 'Export PDF'}
       </Button>
     </div>
+  )
+}
+
+function FieldSelect({
+  id,
+  value,
+  onChange,
+  children,
+}: {
+  id: string
+  value: string
+  onChange: (value: string) => void
+  children: ReactNode
+}) {
+  return (
+    <Select value={value} onValueChange={onChange}>
+      <SelectTrigger id={id} size="sm" className="w-[150px]">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>{children}</SelectContent>
+    </Select>
   )
 }
 
@@ -329,15 +345,15 @@ function Field({
 }) {
   return (
     <div className="flex items-center justify-between gap-2">
-      <label htmlFor={htmlFor} className="text-sm">
+      <Label htmlFor={htmlFor} className="text-sm font-normal">
         {label}
-      </label>
+      </Label>
       {children}
     </div>
   )
 }
 
-function Toggle({
+function SettingSwitch({
   label,
   checked,
   onChange,
@@ -346,15 +362,13 @@ function Toggle({
   checked: boolean
   onChange: (value: boolean) => void
 }) {
+  const id = `opt-${label.toLowerCase().replace(/\s+/g, '-')}`
   return (
-    <label className="flex items-center gap-2 text-sm">
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={(event) => onChange(event.target.checked)}
-        className="accent-primary"
-      />
-      {label}
-    </label>
+    <div className="flex items-center justify-between gap-2">
+      <Label htmlFor={id} className="text-sm font-normal">
+        {label}
+      </Label>
+      <Switch id={id} checked={checked} onCheckedChange={onChange} />
+    </div>
   )
 }
