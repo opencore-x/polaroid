@@ -11,6 +11,7 @@ export function Polaroid({ photo }: { photo: Photo }) {
   const setCaption = usePhotoStore((state) => state.setCaption)
   const framePadding = useSettingsStore((state) => state.framePadding)
   const captionFontId = useSettingsStore((state) => state.captionFontId)
+  const showCaptions = useSettingsStore((state) => state.showCaptions)
   const fontFamily = captionFontStack(captionFontId)
   const [failed, setFailed] = useState(false)
 
@@ -42,19 +43,23 @@ export function Polaroid({ photo }: { photo: Photo }) {
           paddingBottom: framePadding * 1.5,
         }}
       >
-        <CaptionInput
-          value={photo.captionTop}
-          onChange={(value) => setCaption(photo.id, 'captionTop', value)}
-          placeholder="Add a caption"
-          fontFamily={fontFamily}
-          className="text-lg leading-tight"
-        />
-        <CaptionInput
-          value={photo.captionBottom}
-          onChange={(value) => setCaption(photo.id, 'captionBottom', value)}
-          fontFamily={fontFamily}
-          className="text-sm text-neutral-500"
-        />
+        {showCaptions && (
+          <>
+            <CaptionInput
+              value={photo.captionTop}
+              onChange={(value) => setCaption(photo.id, 'captionTop', value)}
+              placeholder="Add a caption"
+              fontFamily={fontFamily}
+              className="text-lg leading-tight"
+            />
+            <CaptionInput
+              value={photo.captionBottom}
+              onChange={(value) => setCaption(photo.id, 'captionBottom', value)}
+              fontFamily={fontFamily}
+              className="text-sm text-neutral-500"
+            />
+          </>
+        )}
       </div>
     </div>
   )
