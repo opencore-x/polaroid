@@ -3,7 +3,7 @@ import { create } from 'zustand'
 import { type Crop, type Orientation, orientationFor } from '@/lib/crop'
 import { type DateFormat, formatCaptionDate, isAutoDate } from '@/lib/date'
 import { readExif } from '@/lib/exif'
-import { reverseGeocode } from '@/lib/geocode'
+import { isAutoLocation, placeLabel, reverseGeocode } from '@/lib/geocode'
 import {
   type CaptionField,
   type Photo,
@@ -76,7 +76,7 @@ export const usePhotoStore = create<PhotoState>((set) => {
         const place = await reverseGeocode(exif.latitude, exif.longitude)
         if (place) {
           next.place = { city: place.city, country: place.country }
-          next.captionTop = next.place[settings.captionLocation]
+          next.captionTop = placeLabel(next.place, settings.captionLocation)
         }
       }
       if (
@@ -150,11 +150,9 @@ export const usePhotoStore = create<PhotoState>((set) => {
       set((state) => ({
         photos: state.photos.map((p) => {
           if (!p.place) return p
-          const isAuto =
-            p.captionTop === '' ||
-            p.captionTop === p.place.city ||
-            p.captionTop === p.place.country
-          return isAuto ? { ...p, captionTop: p.place[mode] } : p
+          return isAutoLocation(p.captionTop, p.place)
+            ? { ...p, captionTop: placeLabel(p.place, mode) }
+            : p
         }),
       })),
     applyDateFormat: (format) =>
