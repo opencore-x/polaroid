@@ -8,6 +8,8 @@ export interface Photo {
   /** Polaroid caption lines (auto-filled from EXIF later; editable). */
   captionTop: string
   captionBottom: string
+  /** Place resolved from EXIF GPS — kept so the city/country toggle can switch. */
+  place?: { city: string; country: string }
 }
 
 export type CaptionField = 'captionTop' | 'captionBottom'
