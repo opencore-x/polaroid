@@ -1,11 +1,17 @@
 import { create } from 'zustand'
 
-import { type Photo, createPhoto, isImageFile } from '@/lib/photos'
+import {
+  type CaptionField,
+  type Photo,
+  createPhoto,
+  isImageFile,
+} from '@/lib/photos'
 
 interface PhotoState {
   photos: Photo[]
   /** Adds image files to the collection. Returns how many were accepted. */
   addFiles: (files: File[]) => number
+  setCaption: (id: string, field: CaptionField, value: string) => void
   remove: (id: string) => void
   clear: () => void
 }
@@ -19,6 +25,12 @@ export const usePhotoStore = create<PhotoState>((set) => ({
     }
     return accepted.length
   },
+  setCaption: (id, field, value) =>
+    set((state) => ({
+      photos: state.photos.map((photo) =>
+        photo.id === id ? { ...photo, [field]: value } : photo,
+      ),
+    })),
   remove: (id) =>
     set((state) => {
       const target = state.photos.find((photo) => photo.id === id)
