@@ -4,10 +4,11 @@ import { type Orientation, DEFAULT_ORIENTATION } from '@/lib/crop'
 import { type DateFormat, DEFAULT_DATE_FORMAT } from '@/lib/date'
 import { DEFAULT_CAPTION_FONT_ID } from '@/lib/fonts'
 import { type LocationDetail } from '@/lib/geocode'
-import { DEFAULT_PAPER_SIZE_ID } from '@/lib/layout'
-
-export const MIN_FRAME_PADDING = 6
-export const MAX_FRAME_PADDING = 28
+import {
+  DEFAULT_BORDER_COLOR,
+  DEFAULT_BORDER_WIDTH,
+  DEFAULT_PAPER_SIZE_ID,
+} from '@/lib/layout'
 
 export const MIN_PER_ROW = 2
 export const MAX_PER_ROW = 5
@@ -16,7 +17,8 @@ export type CaptionLocation = LocationDetail
 
 /** The persistable subset of settings (no action functions). */
 export interface SettingsSnapshot {
-  framePadding: number
+  borderColor: string
+  borderWidth: number
   frameShape: Orientation
   captionFontId: string
   paperSizeId: string
@@ -37,7 +39,8 @@ export function settingsSnapshot(state: SettingsState): SettingsSnapshot {
 }
 
 export const PERSISTED_SETTINGS_KEYS: (keyof SettingsSnapshot)[] = [
-  'framePadding',
+  'borderColor',
+  'borderWidth',
   'frameShape',
   'captionFontId',
   'paperSizeId',
@@ -50,9 +53,12 @@ export const PERSISTED_SETTINGS_KEYS: (keyof SettingsSnapshot)[] = [
 ]
 
 interface SettingsState {
-  /** White polaroid border width in px (sides/top); the bottom is thicker. */
-  framePadding: number
-  setFramePadding: (px: number) => void
+  /** Polaroid border colour (hex) — the card the photo sits on. */
+  borderColor: string
+  setBorderColor: (hex: string) => void
+  /** Border thickness as a fraction of the frame width (sides/top). */
+  borderWidth: number
+  setBorderWidth: (ratio: number) => void
   /** Frame shape for the whole sheet — the photo covers a box of this aspect. */
   frameShape: Orientation
   setFrameShape: (shape: Orientation) => void
@@ -82,8 +88,10 @@ interface SettingsState {
 }
 
 export const useSettingsStore = create<SettingsState>((set) => ({
-  framePadding: 14,
-  setFramePadding: (px) => set({ framePadding: px }),
+  borderColor: DEFAULT_BORDER_COLOR,
+  setBorderColor: (hex) => set({ borderColor: hex }),
+  borderWidth: DEFAULT_BORDER_WIDTH,
+  setBorderWidth: (ratio) => set({ borderWidth: ratio }),
   frameShape: DEFAULT_ORIENTATION,
   setFrameShape: (shape) => set({ frameShape: shape }),
   captionFontId: DEFAULT_CAPTION_FONT_ID,
