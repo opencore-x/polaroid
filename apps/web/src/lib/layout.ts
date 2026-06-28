@@ -17,6 +17,29 @@ export interface Rect {
   height: number
 }
 
+export interface Segment {
+  x1: number
+  y1: number
+  x2: number
+  y2: number
+}
+
+/** L-shaped trim ticks at each corner of a polaroid, extending outward (mm). */
+export function cropMarks(r: Rect, len = 2.5): Segment[] {
+  const x2 = r.x + r.width
+  const y2 = r.y + r.height
+  return [
+    { x1: r.x - len, y1: r.y, x2: r.x, y2: r.y },
+    { x1: r.x, y1: r.y - len, x2: r.x, y2: r.y },
+    { x1: x2, y1: r.y, x2: x2 + len, y2: r.y },
+    { x1: x2, y1: r.y - len, x2: x2, y2: r.y },
+    { x1: r.x - len, y1: y2, x2: r.x, y2: y2 },
+    { x1: r.x, y1: y2, x2: r.x, y2: y2 + len },
+    { x1: x2, y1: y2, x2: x2 + len, y2: y2 },
+    { x1: x2, y1: y2, x2: x2, y2: y2 + len },
+  ]
+}
+
 export interface SheetLayout {
   perRow: number
   rows: number
