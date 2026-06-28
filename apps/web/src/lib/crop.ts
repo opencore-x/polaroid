@@ -102,3 +102,14 @@ export function windowBox(box: number, orientation: Orientation) {
     top: (box - height) / 2,
   }
 }
+
+/** Same as `windowBox` but as CSS percentage strings of a square frame. */
+export function windowPercent(orientation: Orientation) {
+  const box = windowBox(100, orientation)
+  return {
+    width: `${box.width}%`,
+    height: `${box.height}%`,
+    left: `${box.left}%`,
+    top: `${box.top}%`,
+  }
+}

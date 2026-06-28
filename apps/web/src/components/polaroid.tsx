@@ -1,14 +1,30 @@
+import { RectangleHorizontal, RectangleVertical, Square } from 'lucide-react'
+
 import { CroppedImage } from '@/components/cropped-image'
-import { MAX_CROP_SCALE, MIN_CROP_SCALE } from '@/lib/crop'
+import {
+  MAX_CROP_SCALE,
+  MIN_CROP_SCALE,
+  ORIENTATIONS,
+  type Orientation,
+  orientationAspect,
+  windowPercent,
+} from '@/lib/crop'
 import { cn } from '@/lib/utils'
 import { captionFontStack } from '@/lib/fonts'
 import { type Photo } from '@/lib/photos'
 import { usePhotoStore } from '@/stores/photo-store'
 import { useSettingsStore } from '@/stores/settings-store'
 
+const ORIENTATION_ICONS: Record<Orientation, typeof Square> = {
+  square: Square,
+  portrait: RectangleVertical,
+  landscape: RectangleHorizontal,
+}
+
 export function Polaroid({ photo }: { photo: Photo }) {
   const setCaption = usePhotoStore((state) => state.setCaption)
   const setCrop = usePhotoStore((state) => state.setCrop)
+  const setOrientation = usePhotoStore((state) => state.setOrientation)
   const framePadding = useSettingsStore((state) => state.framePadding)
   const captionFontId = useSettingsStore((state) => state.captionFontId)
   const showCaptions = useSettingsStore((state) => state.showCaptions)
@@ -19,26 +35,58 @@ export function Polaroid({ photo }: { photo: Photo }) {
       className="flex flex-col bg-white shadow-md"
       style={{ padding: framePadding, paddingBottom: 0 }}
     >
-      <div className="aspect-square overflow-hidden bg-neutral-200">
-        <CroppedImage
-          src={photo.url}
-          alt={photo.name}
-          crop={photo.crop}
-          onCropChange={(crop) => setCrop(photo.id, crop)}
+      <div className="relative aspect-square overflow-hidden bg-white">
+        <div
+          className="absolute overflow-hidden bg-neutral-200"
+          style={windowPercent(photo.orientation)}
+        >
+          <CroppedImage
+            src={photo.url}
+            alt={photo.name}
+            crop={photo.crop}
+            aspect={orientationAspect(photo.orientation)}
+            onCropChange={(crop) => setCrop(photo.id, crop)}
+          />
+        </div>
+      </div>
+      <div className="mt-1 flex items-center gap-2">
+        <div className="flex gap-0.5">
+          {ORIENTATIONS.map((orientation) => {
+            const Icon = ORIENTATION_ICONS[orientation]
+            const active = photo.orientation === orientation
+            return (
+              <button
+                key={orientation}
+                type="button"
+                aria-label={`${orientation} frame`}
+                aria-pressed={active}
+                onClick={() => setOrientation(photo.id, orientation)}
+                className={cn(
+                  'flex size-6 items-center justify-center rounded text-neutral-500 hover:bg-neutral-100',
+                  active && 'bg-neutral-200 text-neutral-900',
+                )}
+              >
+                <Icon className="size-3.5" />
+              </button>
+            )
+          })}
+        </div>
+        <input
+          type="range"
+          aria-label="Zoom photo"
+          min={MIN_CROP_SCALE}
+          max={MAX_CROP_SCALE}
+          step={0.01}
+          value={photo.crop.scale}
+          onChange={(event) =>
+            setCrop(photo.id, {
+              ...photo.crop,
+              scale: Number(event.target.value),
+            })
+          }
+          className="accent-primary flex-1"
         />
       </div>
-      <input
-        type="range"
-        aria-label="Zoom photo"
-        min={MIN_CROP_SCALE}
-        max={MAX_CROP_SCALE}
-        step={0.01}
-        value={photo.crop.scale}
-        onChange={(event) =>
-          setCrop(photo.id, { ...photo.crop, scale: Number(event.target.value) })
-        }
-        className="accent-primary mt-1 w-full"
-      />
       <div
         className="flex flex-col items-center"
         style={{

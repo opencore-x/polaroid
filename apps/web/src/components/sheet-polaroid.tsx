@@ -1,4 +1,5 @@
 import { CroppedImage } from '@/components/cropped-image'
+import { orientationAspect, windowPercent } from '@/lib/crop'
 import { POLAROID } from '@/lib/layout'
 import { type Photo } from '@/lib/photos'
 
@@ -31,10 +32,20 @@ export function SheetPolaroid({
       }}
     >
       <div
-        className="overflow-hidden bg-neutral-200"
+        className="relative overflow-hidden bg-white"
         style={{ width: imageSize, height: imageSize }}
       >
-        <CroppedImage src={photo.url} alt={photo.name} crop={photo.crop} />
+        <div
+          className="absolute overflow-hidden bg-neutral-200"
+          style={windowPercent(photo.orientation)}
+        >
+          <CroppedImage
+            src={photo.url}
+            alt={photo.name}
+            crop={photo.crop}
+            aspect={orientationAspect(photo.orientation)}
+          />
+        </div>
       </div>
       <div
         className="flex flex-1 flex-col items-center justify-center overflow-hidden text-center"
