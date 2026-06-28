@@ -25,6 +25,8 @@ export interface Photo {
   crop: Crop
   /** Shape of the photo window (square / portrait / landscape). */
   orientation: Orientation
+  /** Per-frame border colour override (hex); falls back to the sheet colour. */
+  borderColor?: string
   /** True while EXIF + reverse-geocoding is still running for this photo. */
   enriching: boolean
 }

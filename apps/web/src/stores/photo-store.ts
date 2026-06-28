@@ -23,6 +23,8 @@ interface PhotoState {
   /** Updates how a photo is framed (pan + zoom) inside its window. */
   setCrop: (id: string, crop: Crop) => void
   setOrientation: (id: string, orientation: Orientation) => void
+  /** Sets a per-frame border colour, or clears it (back to the sheet colour). */
+  setPhotoBorder: (id: string, color: string | undefined) => void
   /** Moves the photo with `activeId` to the position of `overId`. */
   reorder: (activeId: string, overId: string) => void
   /** Re-derives auto location captions when the city/country mode changes. */
@@ -136,6 +138,12 @@ export const usePhotoStore = create<PhotoState>((set) => {
       set((state) => ({
         photos: state.photos.map((photo) =>
           photo.id === id ? { ...photo, orientation } : photo,
+        ),
+      })),
+    setPhotoBorder: (id, color) =>
+      set((state) => ({
+        photos: state.photos.map((photo) =>
+          photo.id === id ? { ...photo, borderColor: color } : photo,
         ),
       })),
     reorder: (activeId, overId) =>

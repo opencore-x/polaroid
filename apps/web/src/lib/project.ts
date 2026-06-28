@@ -22,6 +22,7 @@ interface ProjectPhoto {
   cameraLine?: string
   crop: Crop
   orientation: Orientation
+  borderColor?: string
   /** The image embedded as a data URL (base64). */
   dataUrl: string
 }
@@ -55,6 +56,7 @@ export async function buildProjectFile(
       cameraLine: photo.cameraLine,
       crop: photo.crop,
       orientation: photo.orientation,
+      borderColor: photo.borderColor,
       dataUrl: await fileToDataUrl(photo.file),
     })),
   )
@@ -104,6 +106,7 @@ export async function importProject(file: File): Promise<{
         cameraLine: entry.cameraLine,
         crop: entry.crop ?? DEFAULT_CROP,
         orientation: entry.orientation ?? DEFAULT_ORIENTATION,
+        borderColor: entry.borderColor,
         enriching: false,
       } satisfies Photo
     }),
