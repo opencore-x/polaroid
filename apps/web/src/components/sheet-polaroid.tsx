@@ -9,10 +9,12 @@ export function SheetPolaroid({
   photo,
   width,
   fontStack,
+  showCaptions,
 }: {
   photo: Photo
   width: number
   fontStack: string
+  showCaptions: boolean
 }) {
   const pad = width * POLAROID.framePad
   const imageSize = width - pad * 2
@@ -41,26 +43,30 @@ export function SheetPolaroid({
         className="flex flex-1 flex-col items-center justify-center overflow-hidden text-center"
         style={{ fontFamily: fontStack }}
       >
-        <span
-          className="max-w-full truncate"
-          style={{
-            fontSize: width * POLAROID.captionTopSize,
-            lineHeight: 1.1,
-            color: '#262626',
-          }}
-        >
-          {photo.captionTop}
-        </span>
-        <span
-          className="max-w-full truncate"
-          style={{
-            fontSize: width * POLAROID.captionBottomSize,
-            lineHeight: 1.1,
-            color: '#737373',
-          }}
-        >
-          {photo.captionBottom}
-        </span>
+        {showCaptions && (
+          <>
+            <span
+              className="max-w-full truncate"
+              style={{
+                fontSize: width * POLAROID.captionTopSize,
+                lineHeight: 1.1,
+                color: '#262626',
+              }}
+            >
+              {photo.captionTop}
+            </span>
+            <span
+              className="max-w-full truncate"
+              style={{
+                fontSize: width * POLAROID.captionBottomSize,
+                lineHeight: 1.1,
+                color: '#737373',
+              }}
+            >
+              {photo.captionBottom}
+            </span>
+          </>
+        )}
       </div>
     </div>
   )

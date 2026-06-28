@@ -46,6 +46,7 @@ export async function buildSheetPdf(
   photos: Photo[],
   perRow: number,
   cutMarks: boolean,
+  showCaptions: boolean,
 ): Promise<Uint8Array> {
   const doc = await PDFDocument.create()
   const font = await doc.embedFont(StandardFonts.Helvetica)
@@ -115,7 +116,7 @@ export async function buildSheetPdf(
       const topSize = w * POLAROID.captionTopSize
       const botSize = w * POLAROID.captionBottomSize
       const capY = pageH - yTop - pad - imgSize - pad * 0.6
-      if (photo.captionTop) {
+      if (showCaptions && photo.captionTop) {
         page.drawText(photo.captionTop, {
           x: centerX(photo.captionTop, topSize, cx),
           y: capY - topSize,
@@ -124,7 +125,7 @@ export async function buildSheetPdf(
           color: rgb(0.15, 0.15, 0.15),
         })
       }
-      if (photo.captionBottom) {
+      if (showCaptions && photo.captionBottom) {
         page.drawText(photo.captionBottom, {
           x: centerX(photo.captionBottom, botSize, cx),
           y: capY - topSize - botSize - 2,
@@ -143,9 +144,10 @@ export async function downloadSheetPdf(
   photos: Photo[],
   perRow: number,
   cutMarks: boolean,
+  showCaptions: boolean,
   filename = 'polaroids.pdf',
 ): Promise<void> {
-  const bytes = await buildSheetPdf(photos, perRow, cutMarks)
+  const bytes = await buildSheetPdf(photos, perRow, cutMarks, showCaptions)
   const blob = new Blob([bytes as BlobPart], { type: 'application/pdf' })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')

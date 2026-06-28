@@ -9,12 +9,14 @@ export function SheetPage({
   perRow,
   fontStack,
   showCutMarks,
+  showCaptions,
 }: {
   photos: Photo[]
   width: number
   perRow: number
   fontStack: string
   showCutMarks: boolean
+  showCaptions: boolean
 }) {
   const layout = sheetLayout(perRow)
   const mmToPx = width / A4_MM.width
@@ -47,6 +49,7 @@ export function SheetPage({
                 photo={photo}
                 width={rect.width * mmToPx}
                 fontStack={fontStack}
+                showCaptions={showCaptions}
               />
             </div>
           )
