@@ -1,4 +1,5 @@
 import { SheetPolaroid } from '@/components/sheet-polaroid'
+import { type Orientation } from '@/lib/crop'
 import { type PaperSize, cropMarks, sheetLayout } from '@/lib/layout'
 import { type Photo } from '@/lib/photos'
 import { useEditorStore } from '@/stores/editor-store'
@@ -9,6 +10,7 @@ export function SheetPage({
   width,
   perRow,
   paper,
+  shape,
   fontStack,
   showCutMarks,
   showCaptions,
@@ -19,6 +21,7 @@ export function SheetPage({
   width: number
   perRow: number
   paper: PaperSize
+  shape: Orientation
   fontStack: string
   showCutMarks: boolean
   showCaptions: boolean
@@ -27,7 +30,7 @@ export function SheetPage({
 }) {
   const selectedId = useEditorStore((state) => state.selectedId)
   const select = useEditorStore((state) => state.select)
-  const layout = sheetLayout(perRow, paper)
+  const layout = sheetLayout(perRow, paper, shape)
   const mmToPx = width / paper.widthMm
   const pageHeight = width * (paper.heightMm / paper.widthMm)
 
@@ -62,6 +65,7 @@ export function SheetPage({
               <SheetPolaroid
                 photo={photo}
                 width={rect.width * mmToPx}
+                shape={shape}
                 fontStack={fontStack}
                 showCaptions={showCaptions}
                 showCameraLine={showCameraLine}

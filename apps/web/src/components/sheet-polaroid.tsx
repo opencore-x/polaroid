@@ -1,8 +1,8 @@
 import { type CSSProperties } from 'react'
 
 import { CroppedImage } from '@/components/cropped-image'
-import { orientationAspect, windowPercent } from '@/lib/crop'
-import { POLAROID } from '@/lib/layout'
+import { type Orientation, orientationAspect } from '@/lib/crop'
+import { POLAROID, cardAspect } from '@/lib/layout'
 import { type Photo } from '@/lib/photos'
 import { cn } from '@/lib/utils'
 import { usePhotoStore } from '@/stores/photo-store'
@@ -15,6 +15,7 @@ import { usePhotoStore } from '@/stores/photo-store'
 export function SheetPolaroid({
   photo,
   width,
+  shape,
   fontStack,
   showCaptions,
   showCameraLine,
@@ -24,6 +25,7 @@ export function SheetPolaroid({
 }: {
   photo: Photo
   width: number
+  shape: Orientation
   fontStack: string
   showCaptions: boolean
   showCameraLine: boolean
@@ -34,7 +36,8 @@ export function SheetPolaroid({
   const setCrop = usePhotoStore((state) => state.setCrop)
   const setCaption = usePhotoStore((state) => state.setCaption)
   const pad = width * POLAROID.framePad
-  const imageSize = width - pad * 2
+  const aspect = orientationAspect(shape)
+  const imageH = (width - pad * 2) / aspect
   const editing = editable && selected
 
   return (
@@ -47,7 +50,7 @@ export function SheetPolaroid({
       )}
       style={{
         width,
-        height: width * POLAROID.aspect,
+        height: width * cardAspect(shape),
         padding: pad,
         paddingBottom: 0,
         outlineOffset: 2,
@@ -62,23 +65,16 @@ export function SheetPolaroid({
       }
     >
       <div
-        className="relative overflow-hidden bg-white"
-        style={{ width: imageSize, height: imageSize }}
+        className="relative overflow-hidden bg-neutral-200"
+        style={{ height: imageH }}
       >
-        <div
-          className="absolute overflow-hidden bg-neutral-200"
-          style={windowPercent(photo.orientation)}
-        >
-          <CroppedImage
-            src={photo.url}
-            alt={photo.name}
-            crop={photo.crop}
-            aspect={orientationAspect(photo.orientation)}
-            onCropChange={
-              editing ? (crop) => setCrop(photo.id, crop) : undefined
-            }
-          />
-        </div>
+        <CroppedImage
+          src={photo.url}
+          alt={photo.name}
+          crop={photo.crop}
+          aspect={aspect}
+          onCropChange={editing ? (crop) => setCrop(photo.id, crop) : undefined}
+        />
       </div>
       <div
         className="flex flex-1 flex-col items-center justify-center overflow-hidden text-center"
