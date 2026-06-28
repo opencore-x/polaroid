@@ -5,7 +5,12 @@ export interface Photo {
   url: string
   name: string
   size: number
+  /** Polaroid caption lines (auto-filled from EXIF later; editable). */
+  captionTop: string
+  captionBottom: string
 }
+
+export type CaptionField = 'captionTop' | 'captionBottom'
 
 const IMAGE_EXTENSIONS = /\.(jpe?g|png|webp|heic|heif|avif|gif|bmp|tiff?)$/i
 
@@ -20,6 +25,8 @@ export function createPhoto(file: File): Photo {
     url: URL.createObjectURL(file),
     name: file.name,
     size: file.size,
+    captionTop: '',
+    captionBottom: '',
   }
 }
 
