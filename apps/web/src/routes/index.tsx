@@ -13,7 +13,7 @@ function Home() {
   const hasPhotos = usePhotoStore((state) => state.photos.length > 0)
 
   return (
-    <main className="mx-auto flex min-h-svh w-full max-w-4xl flex-col gap-8 p-6 sm:p-8">
+    <main className="mx-auto flex min-h-svh w-full max-w-4xl flex-col gap-6 p-4 sm:gap-8 sm:p-8">
       <header className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold tracking-tight">Polaroid</h1>
         <p className="text-muted-foreground text-sm">
