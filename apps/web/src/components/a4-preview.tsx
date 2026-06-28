@@ -1,9 +1,10 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 
+import { SheetControls } from '@/components/sheet-controls'
 import { SheetPolaroid } from '@/components/sheet-polaroid'
 import { Button } from '@/components/ui/button'
 import { captionFontStack } from '@/lib/fonts'
-import { A4_MM, sheetLayout } from '@/lib/layout'
+import { A4_MM, cropMarks, sheetLayout } from '@/lib/layout'
 import { downloadSheetPdf } from '@/lib/pdf'
 import { usePhotoStore } from '@/stores/photo-store'
 import { useSettingsStore } from '@/stores/settings-store'
@@ -12,6 +13,7 @@ export function A4Preview() {
   const photos = usePhotoStore((state) => state.photos)
   const captionFontId = useSettingsStore((state) => state.captionFontId)
   const perRow = useSettingsStore((state) => state.polaroidsPerRow)
+  const showCutMarks = useSettingsStore((state) => state.showCutMarks)
   const fontStack = captionFontStack(captionFontId)
 
   const containerRef = useRef<HTMLDivElement>(null)
@@ -21,7 +23,7 @@ export function A4Preview() {
   const handleExport = async () => {
     setIsExporting(true)
     try {
-      await downloadSheetPdf(photos, perRow)
+      await downloadSheetPdf(photos, perRow, showCutMarks)
     } finally {
       setIsExporting(false)
     }
@@ -57,6 +59,7 @@ export function A4Preview() {
           {isExporting ? 'Preparing…' : 'Export PDF'}
         </Button>
       </div>
+      <SheetControls />
       <div ref={containerRef} className="mx-auto w-full max-w-xl">
         <div
           className="relative bg-white shadow-md ring-1 ring-black/10"
@@ -88,6 +91,27 @@ export function A4Preview() {
                 </div>
               )
             })}
+          {showCutMarks && width > 0 && (
+            <svg
+              className="pointer-events-none absolute inset-0"
+              width={width}
+              height={pageHeight}
+            >
+              {shown.flatMap((photo, index) =>
+                cropMarks(layout.rectFor(index)).map((seg, segIndex) => (
+                  <line
+                    key={`${photo.id}-${segIndex}`}
+                    x1={seg.x1 * mmToPx}
+                    y1={seg.y1 * mmToPx}
+                    x2={seg.x2 * mmToPx}
+                    y2={seg.y2 * mmToPx}
+                    stroke="#9ca3af"
+                    strokeWidth={0.75}
+                  />
+                )),
+              )}
+            </svg>
+          )}
         </div>
       </div>
       {overflow > 0 && (
