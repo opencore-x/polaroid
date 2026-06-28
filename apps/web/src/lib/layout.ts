@@ -1,5 +1,30 @@
-export const A4_MM = { width: 210, height: 297 }
 export const PT_PER_MM = 72 / 25.4
+
+export interface PaperSize {
+  id: string
+  label: string
+  widthMm: number
+  heightMm: number
+  /** Printer-safe inner margin for this stock (mm). */
+  marginMm: number
+}
+
+// Common print stocks. Photo papers (4×6 / 5×7) get a tighter margin since
+// they're often run borderless; A4 / Letter keep 10mm to clear the inkjet
+// non-printable edge.
+export const PAPER_SIZES: PaperSize[] = [
+  { id: 'a4', label: 'A4', widthMm: 210, heightMm: 297, marginMm: 10 },
+  { id: 'letter', label: 'US Letter', widthMm: 215.9, heightMm: 279.4, marginMm: 10 },
+  { id: '4x6', label: '4×6 in', widthMm: 101.6, heightMm: 152.4, marginMm: 5 },
+  { id: '5x7', label: '5×7 in', widthMm: 127, heightMm: 177.8, marginMm: 5 },
+  { id: 'square', label: 'Square 8 in', widthMm: 203.2, heightMm: 203.2, marginMm: 6 },
+]
+
+export const DEFAULT_PAPER_SIZE_ID = 'a4'
+
+export function paperSize(id: string): PaperSize {
+  return PAPER_SIZES.find((paper) => paper.id === id) ?? PAPER_SIZES[0]
+}
 
 // Polaroid proportions, expressed as ratios of the polaroid's width so the same
 // numbers drive the on-screen preview (px) and the exported PDF (pt).
@@ -60,12 +85,12 @@ export interface SheetLayout {
 
 export function sheetLayout(
   perRow: number,
-  // 10mm keeps content inside the non-printable edge of typical home inkjets.
-  marginMm = 10,
+  paper: PaperSize,
   gapMm = 4,
 ): SheetLayout {
-  const usableW = A4_MM.width - marginMm * 2
-  const usableH = A4_MM.height - marginMm * 2
+  const marginMm = paper.marginMm
+  const usableW = paper.widthMm - marginMm * 2
+  const usableH = paper.heightMm - marginMm * 2
   const cellWidthMm = (usableW - gapMm * (perRow - 1)) / perRow
   const cellHeightMm = cellWidthMm * POLAROID.aspect
   const rows = Math.max(1, Math.floor((usableH + gapMm) / (cellHeightMm + gapMm)))
