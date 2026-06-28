@@ -14,6 +14,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { GripVertical, X } from 'lucide-react'
 
+import { CaptionControls } from '@/components/caption-controls'
 import { CaptionFontControl } from '@/components/caption-font-control'
 import { FrameControls } from '@/components/frame-controls'
 import { Polaroid } from '@/components/polaroid'
@@ -47,6 +48,7 @@ export function PhotoGrid() {
           {photos.length} {photos.length === 1 ? 'photo' : 'photos'}
         </h2>
         <div className="flex flex-wrap items-center gap-3">
+          <CaptionControls />
           <CaptionFontControl />
           <FrameControls />
           <Button variant="ghost" size="sm" onClick={clear}>
