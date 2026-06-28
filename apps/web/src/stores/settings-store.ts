@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 
+import { type DateFormat, DEFAULT_DATE_FORMAT } from '@/lib/date'
 import { DEFAULT_CAPTION_FONT_ID } from '@/lib/fonts'
 import { DEFAULT_PAPER_SIZE_ID } from '@/lib/layout'
 
@@ -19,6 +20,8 @@ export interface SettingsSnapshot {
   polaroidsPerRow: number
   showCutMarks: boolean
   captionLocation: CaptionLocation
+  dateFormat: DateFormat
+  showCameraLine: boolean
   showCaptions: boolean
 }
 
@@ -29,6 +32,8 @@ export const PERSISTED_SETTINGS_KEYS: (keyof SettingsSnapshot)[] = [
   'polaroidsPerRow',
   'showCutMarks',
   'captionLocation',
+  'dateFormat',
+  'showCameraLine',
   'showCaptions',
 ]
 
@@ -50,6 +55,12 @@ interface SettingsState {
   /** Whether the location caption shows the city or the country. */
   captionLocation: CaptionLocation
   setCaptionLocation: (location: CaptionLocation) => void
+  /** How the auto date caption is formatted. */
+  dateFormat: DateFormat
+  setDateFormat: (format: DateFormat) => void
+  /** Whether to show the camera/lens/exposure line under captions. */
+  showCameraLine: boolean
+  setShowCameraLine: (show: boolean) => void
   /** Whether captions are shown at all. */
   showCaptions: boolean
   setShowCaptions: (show: boolean) => void
@@ -68,6 +79,10 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   setShowCutMarks: (show) => set({ showCutMarks: show }),
   captionLocation: 'city',
   setCaptionLocation: (location) => set({ captionLocation: location }),
+  dateFormat: DEFAULT_DATE_FORMAT,
+  setDateFormat: (format) => set({ dateFormat: format }),
+  showCameraLine: false,
+  setShowCameraLine: (show) => set({ showCameraLine: show }),
   showCaptions: true,
   setShowCaptions: (show) => set({ showCaptions: show }),
 }))
