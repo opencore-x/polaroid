@@ -1,15 +1,13 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 
-import { SheetControls } from '@/components/sheet-controls'
 import { SheetInspector } from '@/components/sheet-inspector'
 import { SheetPage } from '@/components/sheet-page'
-import { Button } from '@/components/ui/button'
 import { captionFontStack } from '@/lib/fonts'
 import { paperSize, sheetLayout } from '@/lib/layout'
-import { downloadSheetPdf } from '@/lib/pdf'
 import { usePhotoStore } from '@/stores/photo-store'
 import { useSettingsStore } from '@/stores/settings-store'
 
+/** The centre column: the print sheet itself, with a floating frame inspector. */
 export function A4Preview() {
   const photos = usePhotoStore((state) => state.photos)
   const captionFontId = useSettingsStore((state) => state.captionFontId)
@@ -23,24 +21,6 @@ export function A4Preview() {
 
   const containerRef = useRef<HTMLDivElement>(null)
   const [width, setWidth] = useState(0)
-  const [isExporting, setIsExporting] = useState(false)
-
-  const handleExport = async () => {
-    setIsExporting(true)
-    try {
-      await downloadSheetPdf(
-        photos,
-        perRow,
-        showCutMarks,
-        showCaptions,
-        showCameraLine,
-        paper,
-        captionFontId,
-      )
-    } finally {
-      setIsExporting(false)
-    }
-  }
 
   useLayoutEffect(() => {
     const el = containerRef.current
@@ -62,21 +42,14 @@ export function A4Preview() {
 
   return (
     <section className="flex flex-col gap-3">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="text-sm font-medium">
-          Print sheet ({paper.label})
-          {pageCount > 1 ? ` — ${pageCount} pages` : ''}
-        </h2>
-        <Button
-          size="sm"
-          disabled={isExporting || photos.length === 0}
-          onClick={() => void handleExport()}
-        >
-          {isExporting ? 'Preparing…' : 'Export PDF'}
-        </Button>
+      <h2 className="text-center text-sm font-medium">
+        Print sheet ({paper.label})
+        {pageCount > 1 ? ` — ${pageCount} pages` : ''}
+      </h2>
+      {/* Floats over the page so the selected frame's tools follow you. */}
+      <div className="sticky top-2 z-20 mx-auto w-full max-w-xl empty:hidden">
+        <SheetInspector />
       </div>
-      <SheetControls />
-      <SheetInspector />
       <div
         ref={containerRef}
         className="mx-auto flex w-full max-w-xl flex-col gap-5"
