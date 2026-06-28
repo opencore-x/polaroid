@@ -10,6 +10,8 @@ export interface Photo {
   captionBottom: string
   /** Place resolved from EXIF GPS — kept so the city/country toggle can switch. */
   place?: { city: string; country: string }
+  /** True while EXIF + reverse-geocoding is still running for this photo. */
+  enriching: boolean
 }
 
 export type CaptionField = 'captionTop' | 'captionBottom'
@@ -29,6 +31,7 @@ export function createPhoto(file: File): Photo {
     size: file.size,
     captionTop: '',
     captionBottom: '',
+    enriching: true,
   }
 }
 

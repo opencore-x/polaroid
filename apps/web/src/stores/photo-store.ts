@@ -32,33 +32,43 @@ export const usePhotoStore = create<PhotoState>((set) => {
   // Runs async after the photo appears; never overwrites a caption the user
   // has already typed.
   async function enrich(photo: Photo) {
-    const exif = await readExif(photo.file)
-    const next: {
-      captionTop?: string
-      captionBottom?: string
-      place?: { city: string; country: string }
-    } = {}
-    if (exif.takenAt) next.captionBottom = formatCaptionDate(exif.takenAt)
-    if (exif.latitude != null && exif.longitude != null) {
-      const place = await reverseGeocode(exif.latitude, exif.longitude)
-      if (place) {
-        next.place = { city: place.city, country: place.country }
-        next.captionTop = next.place[useSettingsStore.getState().captionLocation]
+    try {
+      const exif = await readExif(photo.file)
+      const next: {
+        captionTop?: string
+        captionBottom?: string
+        place?: { city: string; country: string }
+      } = {}
+      if (exif.takenAt) next.captionBottom = formatCaptionDate(exif.takenAt)
+      if (exif.latitude != null && exif.longitude != null) {
+        const place = await reverseGeocode(exif.latitude, exif.longitude)
+        if (place) {
+          next.place = { city: place.city, country: place.country }
+          next.captionTop =
+            next.place[useSettingsStore.getState().captionLocation]
+        }
       }
+      if (next.captionTop || next.captionBottom || next.place) {
+        set((state) => ({
+          photos: state.photos.map((p) =>
+            p.id === photo.id
+              ? {
+                  ...p,
+                  place: p.place ?? next.place,
+                  captionTop: p.captionTop || next.captionTop || '',
+                  captionBottom: p.captionBottom || next.captionBottom || '',
+                }
+              : p,
+          ),
+        }))
+      }
+    } finally {
+      set((state) => ({
+        photos: state.photos.map((p) =>
+          p.id === photo.id ? { ...p, enriching: false } : p,
+        ),
+      }))
     }
-    if (!next.captionTop && !next.captionBottom && !next.place) return
-    set((state) => ({
-      photos: state.photos.map((p) =>
-        p.id === photo.id
-          ? {
-              ...p,
-              place: p.place ?? next.place,
-              captionTop: p.captionTop || next.captionTop || '',
-              captionBottom: p.captionBottom || next.captionBottom || '',
-            }
-          : p,
-      ),
-    }))
   }
 
   return {
