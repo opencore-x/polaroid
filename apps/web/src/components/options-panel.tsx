@@ -5,8 +5,15 @@ import { Button } from '@/components/ui/button'
 import { DATE_FORMATS, type DateFormat } from '@/lib/date'
 import { CAPTION_FONTS } from '@/lib/fonts'
 import { LOCATION_DETAILS } from '@/lib/geocode'
-import { FRAME_SHAPES, PAPER_SIZES, paperSize } from '@/lib/layout'
+import {
+  BORDER_COLORS,
+  BORDER_WIDTHS,
+  FRAME_SHAPES,
+  PAPER_SIZES,
+  paperSize,
+} from '@/lib/layout'
 import { downloadSheetPdf } from '@/lib/pdf'
+import { cn } from '@/lib/utils'
 import { usePhotoStore } from '@/stores/photo-store'
 import {
   type CaptionLocation,
@@ -38,6 +45,10 @@ export function OptionsPanel() {
   const setPaperSize = useSettingsStore((state) => state.setPaperSize)
   const frameShape = useSettingsStore((state) => state.frameShape)
   const setFrameShape = useSettingsStore((state) => state.setFrameShape)
+  const borderColor = useSettingsStore((state) => state.borderColor)
+  const setBorderColor = useSettingsStore((state) => state.setBorderColor)
+  const borderWidth = useSettingsStore((state) => state.borderWidth)
+  const setBorderWidth = useSettingsStore((state) => state.setBorderWidth)
   const perRow = useSettingsStore((state) => state.polaroidsPerRow)
   const setPerRow = useSettingsStore((state) => state.setPolaroidsPerRow)
   const showCutMarks = useSettingsStore((state) => state.showCutMarks)
@@ -66,6 +77,8 @@ export function OptionsPanel() {
         showCameraLine,
         paper,
         frameShape,
+        borderColor,
+        borderWidth,
         captionFontId,
       )
     } finally {
@@ -143,6 +156,55 @@ export function OptionsPanel() {
           >
             {FRAME_SHAPES.map((option) => (
               <option key={option.id} value={option.id}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Border" htmlFor="opt-border">
+          <span className="flex items-center gap-1">
+            {BORDER_COLORS.map((swatch) => (
+              <button
+                key={swatch.hex}
+                type="button"
+                aria-label={swatch.label}
+                aria-pressed={borderColor.toLowerCase() === swatch.hex}
+                onClick={() => setBorderColor(swatch.hex)}
+                className={cn(
+                  'size-5 rounded-full border border-black/10',
+                  borderColor.toLowerCase() === swatch.hex &&
+                    'ring-primary ring-2 ring-offset-1',
+                )}
+                style={{ backgroundColor: swatch.hex }}
+              />
+            ))}
+            <label
+              aria-label="Custom colour"
+              className="relative size-5 cursor-pointer overflow-hidden rounded-full border border-black/10"
+              style={{
+                background:
+                  'conic-gradient(red, yellow, lime, cyan, blue, magenta, red)',
+              }}
+            >
+              <input
+                id="opt-border"
+                type="color"
+                value={borderColor}
+                onChange={(event) => setBorderColor(event.target.value)}
+                className="absolute inset-0 cursor-pointer opacity-0"
+              />
+            </label>
+          </span>
+        </Field>
+        <Field label="Thickness" htmlFor="opt-thickness">
+          <select
+            id="opt-thickness"
+            className={SELECT_CLASS}
+            value={borderWidth}
+            onChange={(event) => setBorderWidth(Number(event.target.value))}
+          >
+            {BORDER_WIDTHS.map((option) => (
+              <option key={option.label} value={option.ratio}>
                 {option.label}
               </option>
             ))}

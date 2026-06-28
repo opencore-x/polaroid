@@ -1,5 +1,6 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
 
+import { captionColors, hexToRgb01 } from '@/lib/color'
 import { type Crop, type Orientation, cropSource, orientationAspect } from '@/lib/crop'
 import {
   type PaperSize,
@@ -64,6 +65,8 @@ export async function buildSheetPdf(
   showCameraLine: boolean,
   paper: PaperSize,
   shape: Orientation,
+  borderColor: string,
+  borderWidth: number,
   captionFontId: string,
 ): Promise<Uint8Array> {
   const doc = await PDFDocument.create()
@@ -72,8 +75,13 @@ export async function buildSheetPdf(
   const font =
     (await embedCaptionFont(doc, captionFontId)) ??
     (await doc.embedFont(StandardFonts.Helvetica))
-  const layout = sheetLayout(perRow, paper, shape)
+  const layout = sheetLayout(perRow, paper, shape, borderWidth)
   const aspect = orientationAspect(shape)
+  const border = hexToRgb01(borderColor)
+  const ink = captionColors(borderColor)
+  const inkTop = hexToRgb01(ink.top)
+  const inkBottom = hexToRgb01(ink.bottom)
+  const inkCamera = hexToRgb01(ink.camera)
   const pageW = paper.widthMm * PT_PER_MM
   const pageH = paper.heightMm * PT_PER_MM
   const margin = layout.marginMm * PT_PER_MM
@@ -120,7 +128,7 @@ export async function buildSheetPdf(
       const w = r.width * PT_PER_MM
       const h = r.height * PT_PER_MM
       const yTop = r.y * PT_PER_MM
-      const pad = w * POLAROID.framePad
+      const pad = w * borderWidth
       const imgW = w - pad * 2
       const imgH = imgW / aspect
 
@@ -129,8 +137,8 @@ export async function buildSheetPdf(
         y: pageH - yTop - h,
         width: w,
         height: h,
-        color: rgb(1, 1, 1),
-        borderColor: rgb(0.9, 0.9, 0.9),
+        color: rgb(border.r, border.g, border.b),
+        borderColor: rgb(0.85, 0.85, 0.85),
         borderWidth: 0.5,
       })
 
@@ -163,7 +171,7 @@ export async function buildSheetPdf(
           y: capY - topSize,
           size: topSize,
           font,
-          color: rgb(0.15, 0.15, 0.15),
+          color: rgb(inkTop.r, inkTop.g, inkTop.b),
         })
       }
       if (showCaptions && photo.captionBottom) {
@@ -172,7 +180,7 @@ export async function buildSheetPdf(
           y: capY - topSize - botSize - 2,
           size: botSize,
           font,
-          color: rgb(0.45, 0.45, 0.45),
+          color: rgb(inkBottom.r, inkBottom.g, inkBottom.b),
         })
       }
       if (showCaptions && showCameraLine && photo.cameraLine) {
@@ -183,7 +191,7 @@ export async function buildSheetPdf(
           y: capY - topSize - botSize - 2 - camSize - 1.5,
           size: camSize,
           font,
-          color: rgb(0.64, 0.64, 0.64),
+          color: rgb(inkCamera.r, inkCamera.g, inkCamera.b),
         })
       }
     }
@@ -200,6 +208,8 @@ export async function downloadSheetPdf(
   showCameraLine: boolean,
   paper: PaperSize,
   shape: Orientation,
+  borderColor: string,
+  borderWidth: number,
   captionFontId: string,
   filename = 'polaroids.pdf',
 ): Promise<void> {
@@ -211,6 +221,8 @@ export async function downloadSheetPdf(
     showCameraLine,
     paper,
     shape,
+    borderColor,
+    borderWidth,
     captionFontId,
   )
   const blob = new Blob([bytes as BlobPart], { type: 'application/pdf' })
