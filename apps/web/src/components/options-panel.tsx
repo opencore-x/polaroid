@@ -29,7 +29,9 @@ import { usePhotoStore } from '@/stores/photo-store'
 import {
   type CaptionLocation,
   MAX_PER_ROW,
+  MAX_ROWS,
   MIN_PER_ROW,
+  MIN_ROWS,
   useSettingsStore,
 } from '@/stores/settings-store'
 
@@ -60,6 +62,8 @@ export function OptionsPanel() {
   const setBorderWidth = useSettingsStore((state) => state.setBorderWidth)
   const perRow = useSettingsStore((state) => state.polaroidsPerRow)
   const setPerRow = useSettingsStore((state) => state.setPolaroidsPerRow)
+  const rows = useSettingsStore((state) => state.rowsPerPage)
+  const setRows = useSettingsStore((state) => state.setRowsPerPage)
   const showCutMarks = useSettingsStore((state) => state.showCutMarks)
   const setShowCutMarks = useSettingsStore((state) => state.setShowCutMarks)
 
@@ -68,7 +72,7 @@ export function OptionsPanel() {
 
   // When pages carry different shapes the dropdown reads "Mixed"; picking a
   // shape there applies it to every page.
-  const pages = paginate(photos, perRow, paper, frameShape, pageShapes, borderWidth)
+  const pages = paginate(photos, perRow, rows, paper, frameShape, pageShapes, borderWidth)
   const uniformShape = pages.every((p) => p.shape === pages[0].shape)
     ? pages[0].shape
     : null
@@ -88,6 +92,7 @@ export function OptionsPanel() {
       await downloadSheetPdf(
         photos,
         perRow,
+        rows,
         showCutMarks,
         showCaptions,
         showCameraLine,
@@ -238,10 +243,20 @@ export function OptionsPanel() {
         </Field>
         <Field label="Per row" htmlFor="opt-perrow">
           <Stepper
+            noun="per row"
             value={perRow}
             min={MIN_PER_ROW}
             max={MAX_PER_ROW}
             onChange={setPerRow}
+          />
+        </Field>
+        <Field label="Rows" htmlFor="opt-rows">
+          <Stepper
+            noun="rows"
+            value={rows}
+            min={MIN_ROWS}
+            max={MAX_ROWS}
+            onChange={setRows}
           />
         </Field>
         <SettingSwitch
@@ -284,11 +299,13 @@ function FieldSelect({
 }
 
 function Stepper({
+  noun,
   value,
   min,
   max,
   onChange,
 }: {
+  noun: string
   value: number
   min: number
   max: number
@@ -301,7 +318,7 @@ function Stepper({
         variant="outline"
         size="icon"
         className="size-7"
-        aria-label="Fewer per row"
+        aria-label={`Fewer ${noun}`}
         disabled={value <= min}
         onClick={() => onChange(Math.max(min, value - 1))}
       >
@@ -313,7 +330,7 @@ function Stepper({
         variant="outline"
         size="icon"
         className="size-7"
-        aria-label="More per row"
+        aria-label={`More ${noun}`}
         disabled={value >= max}
         onClick={() => onChange(Math.min(max, value + 1))}
       >

@@ -122,8 +122,16 @@ export interface SheetLayout {
   rectFor: (index: number) => Rect
 }
 
+/**
+ * Lays out an explicit `perRow × rows` grid on the sheet. Cells are sized to the
+ * largest that fits BOTH the column-width budget and the row-height budget
+ * (whichever binds — tall shapes are usually height-bound), so a tall 2×2 packs
+ * four frames instead of overflowing to one row. The grid is then centred on the
+ * printable area, splitting any slack evenly.
+ */
 export function sheetLayout(
   perRow: number,
+  rows: number,
   paper: PaperSize,
   shape: Orientation = 'square',
   border = DEFAULT_BORDER_WIDTH,
@@ -132,17 +140,25 @@ export function sheetLayout(
   const marginMm = paper.marginMm
   const usableW = paper.widthMm - marginMm * 2
   const usableH = paper.heightMm - marginMm * 2
-  const cellWidthMm = (usableW - gapMm * (perRow - 1)) / perRow
-  const cellHeightMm = cellWidthMm * cardAspect(shape, border)
-  const rows = Math.max(1, Math.floor((usableH + gapMm) / (cellHeightMm + gapMm)))
+  const aspect = cardAspect(shape, border) // card height ÷ width
+  const widthBudget = (usableW - gapMm * (perRow - 1)) / perRow
+  const heightBudget = (usableH - gapMm * (rows - 1)) / rows
+  const cellWidthMm = Math.min(widthBudget, heightBudget / aspect)
+  const cellHeightMm = cellWidthMm * aspect
   const capacity = perRow * rows
+
+  // Centre the grid in the printable area, splitting leftover space evenly.
+  const gridW = perRow * cellWidthMm + gapMm * (perRow - 1)
+  const gridH = rows * cellHeightMm + gapMm * (rows - 1)
+  const originX = marginMm + (usableW - gridW) / 2
+  const originY = marginMm + (usableH - gridH) / 2
 
   const rectFor = (index: number): Rect => {
     const col = index % perRow
     const row = Math.floor(index / perRow)
     return {
-      x: marginMm + col * (cellWidthMm + gapMm),
-      y: marginMm + row * (cellHeightMm + gapMm),
+      x: originX + col * (cellWidthMm + gapMm),
+      y: originY + row * (cellHeightMm + gapMm),
       width: cellWidthMm,
       height: cellHeightMm,
     }

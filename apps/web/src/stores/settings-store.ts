@@ -12,6 +12,8 @@ import {
 
 export const MIN_PER_ROW = 2
 export const MAX_PER_ROW = 5
+export const MIN_ROWS = 1
+export const MAX_ROWS = 6
 
 export type CaptionLocation = LocationDetail
 
@@ -24,6 +26,7 @@ export interface SettingsSnapshot {
   captionFontId: string
   paperSizeId: string
   polaroidsPerRow: number
+  rowsPerPage: number
   showCutMarks: boolean
   captionLocation: CaptionLocation
   dateFormat: DateFormat
@@ -47,6 +50,7 @@ export const PERSISTED_SETTINGS_KEYS: (keyof SettingsSnapshot)[] = [
   'captionFontId',
   'paperSizeId',
   'polaroidsPerRow',
+  'rowsPerPage',
   'showCutMarks',
   'captionLocation',
   'dateFormat',
@@ -75,9 +79,12 @@ interface SettingsState {
   /** Selected print stock (A4, Letter, 4×6, …). */
   paperSizeId: string
   setPaperSize: (id: string) => void
-  /** Polaroids per row on the sheet. */
+  /** Polaroids per row on the sheet (grid columns). */
   polaroidsPerRow: number
   setPolaroidsPerRow: (count: number) => void
+  /** Grid rows per page; combined with perRow this fixes the frames per sheet. */
+  rowsPerPage: number
+  setRowsPerPage: (count: number) => void
   /** Show crop/cut guides for trimming after printing. */
   showCutMarks: boolean
   setShowCutMarks: (show: boolean) => void
@@ -116,6 +123,8 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   setPaperSize: (id) => set({ paperSizeId: id }),
   polaroidsPerRow: 3,
   setPolaroidsPerRow: (count) => set({ polaroidsPerRow: count }),
+  rowsPerPage: 3,
+  setRowsPerPage: (count) => set({ rowsPerPage: count }),
   showCutMarks: true,
   setShowCutMarks: (show) => set({ showCutMarks: show }),
   captionLocation: 'city',

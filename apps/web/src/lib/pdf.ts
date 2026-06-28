@@ -61,6 +61,7 @@ async function rasterizeJpeg(
 export async function buildSheetPdf(
   photos: Photo[],
   perRow: number,
+  rows: number,
   cutMarks: boolean,
   showCaptions: boolean,
   showCameraLine: boolean,
@@ -77,7 +78,7 @@ export async function buildSheetPdf(
   const font =
     (await embedCaptionFont(doc, captionFontId)) ??
     (await doc.embedFont(StandardFonts.Helvetica))
-  const pages = paginate(photos, perRow, paper, shape, pageShapes, borderWidth)
+  const pages = paginate(photos, perRow, rows, paper, shape, pageShapes, borderWidth)
   const pageW = paper.widthMm * PT_PER_MM
   const pageH = paper.heightMm * PT_PER_MM
   const margin = paper.marginMm * PT_PER_MM
@@ -95,7 +96,7 @@ export async function buildSheetPdf(
   }
 
   for (const sheet of pages) {
-    const layout = sheetLayout(perRow, paper, sheet.shape, borderWidth)
+    const layout = sheetLayout(perRow, rows, paper, sheet.shape, borderWidth)
     const aspect = orientationAspect(sheet.shape)
     const page = doc.addPage([pageW, pageH])
     page.drawRectangle({
@@ -206,6 +207,7 @@ export async function buildSheetPdf(
 export async function downloadSheetPdf(
   photos: Photo[],
   perRow: number,
+  rows: number,
   cutMarks: boolean,
   showCaptions: boolean,
   showCameraLine: boolean,
@@ -220,6 +222,7 @@ export async function downloadSheetPdf(
   const bytes = await buildSheetPdf(
     photos,
     perRow,
+    rows,
     cutMarks,
     showCaptions,
     showCameraLine,

@@ -9,6 +9,7 @@ export function SheetPage({
   photos,
   width,
   perRow,
+  rows,
   paper,
   shape,
   borderColor,
@@ -22,6 +23,7 @@ export function SheetPage({
   photos: Photo[]
   width: number
   perRow: number
+  rows: number
   paper: PaperSize
   shape: Orientation
   borderColor: string
@@ -34,7 +36,7 @@ export function SheetPage({
 }) {
   const selectedId = useEditorStore((state) => state.selectedId)
   const select = useEditorStore((state) => state.select)
-  const layout = sheetLayout(perRow, paper, shape, borderWidth)
+  const layout = sheetLayout(perRow, rows, paper, shape, borderWidth)
   const mmToPx = width / paper.widthMm
   const pageHeight = width * (paper.heightMm / paper.widthMm)
 
