@@ -4,6 +4,10 @@ import { RouterProvider, createRouter } from '@tanstack/react-router'
 
 import { routeTree } from './routeTree.gen'
 import './styles.css'
+import '@fontsource/caveat'
+import '@fontsource/patrick-hand'
+import '@fontsource/shadows-into-light'
+import '@fontsource/kalam'
 
 const router = createRouter({ routeTree })
 
