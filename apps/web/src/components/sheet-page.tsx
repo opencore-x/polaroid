@@ -1,6 +1,7 @@
 import { SheetPolaroid } from '@/components/sheet-polaroid'
 import { type PaperSize, cropMarks, sheetLayout } from '@/lib/layout'
 import { type Photo } from '@/lib/photos'
+import { useEditorStore } from '@/stores/editor-store'
 
 /** One print sheet: margin guide, positioned polaroids, and crop marks. */
 export function SheetPage({
@@ -12,6 +13,7 @@ export function SheetPage({
   showCutMarks,
   showCaptions,
   showCameraLine,
+  editable = false,
 }: {
   photos: Photo[]
   width: number
@@ -21,7 +23,10 @@ export function SheetPage({
   showCutMarks: boolean
   showCaptions: boolean
   showCameraLine: boolean
+  editable?: boolean
 }) {
+  const selectedId = useEditorStore((state) => state.selectedId)
+  const select = useEditorStore((state) => state.select)
   const layout = sheetLayout(perRow, paper)
   const mmToPx = width / paper.widthMm
   const pageHeight = width * (paper.heightMm / paper.widthMm)
@@ -30,6 +35,7 @@ export function SheetPage({
     <div
       className="relative bg-white shadow-md ring-1 ring-black/10"
       style={{ width: width || '100%', height: pageHeight }}
+      onClick={editable ? () => select(null) : undefined}
     >
       <div
         className="pointer-events-none absolute border border-dashed border-neutral-300"
@@ -47,7 +53,11 @@ export function SheetPage({
             <div
               key={photo.id}
               className="absolute"
-              style={{ left: rect.x * mmToPx, top: rect.y * mmToPx }}
+              style={{
+                left: rect.x * mmToPx,
+                top: rect.y * mmToPx,
+                zIndex: editable && selectedId === photo.id ? 10 : undefined,
+              }}
             >
               <SheetPolaroid
                 photo={photo}
@@ -55,6 +65,9 @@ export function SheetPage({
                 fontStack={fontStack}
                 showCaptions={showCaptions}
                 showCameraLine={showCameraLine}
+                editable={editable}
+                selected={editable && selectedId === photo.id}
+                onSelect={() => select(photo.id)}
               />
             </div>
           )
