@@ -12,7 +12,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { GripVertical, X } from 'lucide-react'
+import { GripVertical, Loader2, X } from 'lucide-react'
 
 import { CaptionControls } from '@/components/caption-controls'
 import { CaptionFontControl } from '@/components/caption-font-control'
@@ -115,6 +115,12 @@ function PhotoTile({ photo }: { photo: Photo }) {
       >
         <X />
       </Button>
+      {photo.enriching && (
+        <div className="bg-background/85 text-muted-foreground absolute bottom-1.5 left-1.5 flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] shadow-sm">
+          <Loader2 className="size-3 animate-spin" />
+          Reading…
+        </div>
+      )}
     </li>
   )
 }
