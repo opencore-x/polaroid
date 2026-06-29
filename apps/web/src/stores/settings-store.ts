@@ -14,11 +14,17 @@ export const MIN_PER_ROW = 2
 export const MAX_PER_ROW = 5
 export const MIN_ROWS = 1
 export const MAX_ROWS = 6
+export const MIN_STRIPS_PER_ROW = 2
+export const MAX_STRIPS_PER_ROW = 5
+
+/** Sheet layout format: the polaroid grid or photo-booth strips. */
+export type SheetFormat = 'grid' | 'strip'
 
 export type CaptionLocation = LocationDetail
 
 /** The persistable subset of settings (no action functions). */
 export interface SettingsSnapshot {
+  sheetFormat: SheetFormat
   borderColor: string
   borderWidth: number
   frameShape: Orientation
@@ -27,6 +33,7 @@ export interface SettingsSnapshot {
   paperSizeId: string
   polaroidsPerRow: number
   rowsPerPage: number
+  stripsPerRow: number
   showCutMarks: boolean
   captionLocation: CaptionLocation
   dateFormat: DateFormat
@@ -43,6 +50,7 @@ export function settingsSnapshot(state: SettingsState): SettingsSnapshot {
 }
 
 export const PERSISTED_SETTINGS_KEYS: (keyof SettingsSnapshot)[] = [
+  'sheetFormat',
   'borderColor',
   'borderWidth',
   'frameShape',
@@ -51,6 +59,7 @@ export const PERSISTED_SETTINGS_KEYS: (keyof SettingsSnapshot)[] = [
   'paperSizeId',
   'polaroidsPerRow',
   'rowsPerPage',
+  'stripsPerRow',
   'showCutMarks',
   'captionLocation',
   'dateFormat',
@@ -59,6 +68,9 @@ export const PERSISTED_SETTINGS_KEYS: (keyof SettingsSnapshot)[] = [
 ]
 
 interface SettingsState {
+  /** Sheet layout format: the polaroid grid or photo-booth strips. */
+  sheetFormat: SheetFormat
+  setSheetFormat: (format: SheetFormat) => void
   /** Polaroid border colour (hex) — the card the photo sits on. */
   borderColor: string
   setBorderColor: (hex: string) => void
@@ -85,6 +97,9 @@ interface SettingsState {
   /** Grid rows per page; combined with perRow this fixes the frames per sheet. */
   rowsPerPage: number
   setRowsPerPage: (count: number) => void
+  /** Photo-booth strips per row (strip format only). */
+  stripsPerRow: number
+  setStripsPerRow: (count: number) => void
   /** Show crop/cut guides for trimming after printing. */
   showCutMarks: boolean
   setShowCutMarks: (show: boolean) => void
@@ -103,6 +118,8 @@ interface SettingsState {
 }
 
 export const useSettingsStore = create<SettingsState>((set) => ({
+  sheetFormat: 'grid',
+  setSheetFormat: (format) => set({ sheetFormat: format }),
   borderColor: DEFAULT_BORDER_COLOR,
   setBorderColor: (hex) => set({ borderColor: hex }),
   borderWidth: DEFAULT_BORDER_WIDTH,
@@ -125,6 +142,8 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   setPolaroidsPerRow: (count) => set({ polaroidsPerRow: count }),
   rowsPerPage: 3,
   setRowsPerPage: (count) => set({ rowsPerPage: count }),
+  stripsPerRow: 3,
+  setStripsPerRow: (count) => set({ stripsPerRow: count }),
   showCutMarks: true,
   setShowCutMarks: (show) => set({ showCutMarks: show }),
   captionLocation: 'city',
