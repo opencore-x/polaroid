@@ -12,6 +12,7 @@ import {
 import { paginate } from '@/lib/pages'
 import { embedCaptionFont } from '@/lib/pdf-fonts'
 import { type Photo } from '@/lib/photos'
+import { paginateStrips, stripLayout, toStrips } from '@/lib/strip'
 
 const IMAGE_DPI = 300
 
@@ -204,6 +205,99 @@ export async function buildSheetPdf(
   return doc.save()
 }
 
+/**
+ * Builds a print-ready, sRGB PDF of photo-booth strips: a row of strips per
+ * page, each a coloured card holding four square photos over a footer band.
+ */
+export async function buildStripPdf(
+  photos: Photo[],
+  stripsPerRow: number,
+  cutMarks: boolean,
+  paper: PaperSize,
+  borderColor: string,
+  borderWidth: number,
+): Promise<Uint8Array> {
+  const doc = await PDFDocument.create()
+  const pages = paginateStrips(photos, stripsPerRow, paper, borderWidth)
+  const layout = stripLayout(stripsPerRow, paper, borderWidth)
+  const pageW = paper.widthMm * PT_PER_MM
+  const pageH = paper.heightMm * PT_PER_MM
+  const margin = paper.marginMm * PT_PER_MM
+  const card = hexToRgb01(borderColor)
+  const toPx = (pt: number) => Math.round((pt / PT_PER_MM) * (IMAGE_DPI / 25.4))
+
+  for (const pagePhotos of pages) {
+    const page = doc.addPage([pageW, pageH])
+    page.drawRectangle({
+      x: margin,
+      y: margin,
+      width: pageW - margin * 2,
+      height: pageH - margin * 2,
+      borderColor: rgb(0.85, 0.85, 0.85),
+      borderWidth: 0.5,
+      borderDashArray: [3, 3],
+    })
+
+    const strips = toStrips(pagePhotos)
+    for (let s = 0; s < strips.length; s++) {
+      const stripRect = layout.rectForStrip(s)
+      const x = stripRect.x * PT_PER_MM
+      const yTop = stripRect.y * PT_PER_MM
+      const w = stripRect.width * PT_PER_MM
+      const h = stripRect.height * PT_PER_MM
+
+      page.drawRectangle({
+        x,
+        y: pageH - yTop - h,
+        width: w,
+        height: h,
+        color: rgb(card.r, card.g, card.b),
+        borderColor: rgb(0.85, 0.85, 0.85),
+        borderWidth: 0.5,
+      })
+      if (cutMarks) {
+        for (const seg of cropMarks(stripRect)) {
+          page.drawLine({
+            start: { x: seg.x1 * PT_PER_MM, y: pageH - seg.y1 * PT_PER_MM },
+            end: { x: seg.x2 * PT_PER_MM, y: pageH - seg.y2 * PT_PER_MM },
+            thickness: 0.4,
+            color: rgb(0.6, 0.6, 0.6),
+          })
+        }
+      }
+
+      const photoRects = layout.photoRects(stripRect)
+      for (let i = 0; i < strips[s].length; i++) {
+        const photo = strips[s][i]
+        const pr = photoRects[i]
+        const pw = pr.width * PT_PER_MM
+        const ph = pr.height * PT_PER_MM
+        const jpeg = await rasterizeJpeg(photo.url, toPx(pw), toPx(ph), photo.crop)
+        if (!jpeg) continue
+        const embedded = await doc.embedJpg(jpeg)
+        page.drawImage(embedded, {
+          x: pr.x * PT_PER_MM,
+          y: pageH - pr.y * PT_PER_MM - ph,
+          width: pw,
+          height: ph,
+        })
+      }
+    }
+  }
+
+  return doc.save()
+}
+
+function triggerDownload(bytes: Uint8Array, filename: string): void {
+  const blob = new Blob([bytes as BlobPart], { type: 'application/pdf' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
 export async function downloadSheetPdf(
   photos: Photo[],
   perRow: number,
@@ -233,11 +327,25 @@ export async function downloadSheetPdf(
     borderWidth,
     captionFontId,
   )
-  const blob = new Blob([bytes as BlobPart], { type: 'application/pdf' })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = filename
-  link.click()
-  URL.revokeObjectURL(url)
+  triggerDownload(bytes, filename)
+}
+
+export async function downloadStripPdf(
+  photos: Photo[],
+  stripsPerRow: number,
+  cutMarks: boolean,
+  paper: PaperSize,
+  borderColor: string,
+  borderWidth: number,
+  filename = 'photostrips.pdf',
+): Promise<void> {
+  const bytes = await buildStripPdf(
+    photos,
+    stripsPerRow,
+    cutMarks,
+    paper,
+    borderColor,
+    borderWidth,
+  )
+  triggerDownload(bytes, filename)
 }
