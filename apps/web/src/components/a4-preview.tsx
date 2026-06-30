@@ -1,6 +1,7 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { RectangleHorizontal, RectangleVertical, Square } from "lucide-react";
 
+import { EmptyHero } from "@/components/empty-hero";
 import { SheetInspector } from "@/components/sheet-inspector";
 import { SheetPage } from "@/components/sheet-page";
 import { StripPage } from "@/components/strip-page";
@@ -44,18 +45,23 @@ export function A4Preview() {
   const fontStack = captionFontStack(captionFontId);
   const paper = paperSize(paperSizeId);
 
-  const containerRef = useRef<HTMLDivElement>(null);
+  const observerRef = useRef<ResizeObserver | null>(null);
   const [width, setWidth] = useState(0);
 
-  useLayoutEffect(() => {
-    const el = containerRef.current;
+  // Callback ref so the observer re-attaches whenever the sheet container
+  // mounts — e.g. after the empty-state hero gives way to the first page.
+  const setContainer = useCallback((el: HTMLDivElement | null) => {
+    observerRef.current?.disconnect();
     if (!el) return;
     const update = () => setWidth(el.clientWidth);
     update();
-    const observer = new ResizeObserver(update);
-    observer.observe(el);
-    return () => observer.disconnect();
+    observerRef.current = new ResizeObserver(update);
+    observerRef.current.observe(el);
   }, []);
+
+  if (photos.length === 0) {
+    return <EmptyHero />;
+  }
 
   const gridPages = paginate(
     photos,
@@ -79,7 +85,7 @@ export function A4Preview() {
         <SheetInspector />
       </div>
       <div
-        ref={containerRef}
+        ref={setContainer}
         className="mx-auto flex w-full max-w-xl flex-col gap-5"
       >
         {sheetFormat === "strip"
