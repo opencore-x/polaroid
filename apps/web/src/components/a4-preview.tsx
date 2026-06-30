@@ -133,9 +133,9 @@ export function A4Preview() {
                 />
                 {/* Screen-only controls float over the sheet's top margin so the
                     sheet's top edge stays level with both sidebars. */}
-                <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-2">
+                <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-1">
                   {pageLabel(page) ? <PageBadge label={pageLabel(page)} /> : <span />}
-                  <div className="pointer-events-auto rounded-lg bg-white/40 p-0.5 ring-1 ring-black/5 backdrop-blur-md">
+                  <div className="pointer-events-auto">
                     <PageShapeToggle
                       value={slice.shape}
                       onChange={(shape) => setPageShape(page, shape)}
@@ -157,6 +157,11 @@ function PageBadge({ label }: { label: string }) {
   );
 }
 
+/**
+ * Collapses to a single glassy icon of the current shape so it stays out of the
+ * way of the sheet's margin guide; reveals the full selector on hover or focus
+ * (focus covers touch, where there's no hover).
+ */
 function PageShapeToggle({
   value,
   onChange,
@@ -164,31 +169,51 @@ function PageShapeToggle({
   value: Orientation;
   onChange: (shape: Orientation) => void;
 }) {
+  const CurrentIcon = SHAPE_ICONS[value];
+  const glass =
+    "rounded-md bg-white/40 ring-1 ring-black/5 backdrop-blur-md";
   return (
-    <div className="flex gap-0.5">
-      {FRAME_SHAPES.map(({ id, label }) => {
-        const Icon = SHAPE_ICONS[id];
-        const active = value === id;
-        return (
-          <Tooltip key={id}>
-            <TooltipTrigger asChild>
-              <button
-                type="button"
-                aria-label={`${label} frames on this page`}
-                aria-pressed={active}
-                onClick={() => onChange(id)}
-                className={cn(
-                  "flex size-5 items-center justify-center rounded text-neutral-500 transition-colors hover:bg-black/5 hover:text-neutral-900",
-                  active && "bg-black/10 text-neutral-900",
-                )}
-              >
-                <Icon className="size-3" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>{label} frames on this page</TooltipContent>
-          </Tooltip>
-        );
-      })}
+    <div className="group/shape relative flex justify-end">
+      <button
+        type="button"
+        aria-label="Change page frame shape"
+        className={cn(
+          "flex size-5 items-center justify-center text-neutral-500 transition-opacity group-hover/shape:pointer-events-none group-hover/shape:opacity-0 group-focus-within/shape:pointer-events-none group-focus-within/shape:opacity-0",
+          glass,
+        )}
+      >
+        <CurrentIcon className="size-3" />
+      </button>
+      <div
+        className={cn(
+          "pointer-events-none absolute top-0 right-0 flex gap-0.5 p-0.5 opacity-0 transition-opacity group-hover/shape:pointer-events-auto group-hover/shape:opacity-100 group-focus-within/shape:pointer-events-auto group-focus-within/shape:opacity-100",
+          glass,
+        )}
+      >
+        {FRAME_SHAPES.map(({ id, label }) => {
+          const Icon = SHAPE_ICONS[id];
+          const active = value === id;
+          return (
+            <Tooltip key={id}>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  aria-label={`${label} frames on this page`}
+                  aria-pressed={active}
+                  onClick={() => onChange(id)}
+                  className={cn(
+                    "flex size-5 items-center justify-center rounded text-neutral-500 transition-colors hover:bg-black/5 hover:text-neutral-900",
+                    active && "bg-black/10 text-neutral-900",
+                  )}
+                >
+                  <Icon className="size-3" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>{label} frames on this page</TooltipContent>
+            </Tooltip>
+          );
+        })}
+      </div>
     </div>
   );
 }
