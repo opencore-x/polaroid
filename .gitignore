@@ -150,3 +150,9 @@ vite.config.ts.timestamp-*
 
 # Cloudflare Wrangler local state
 .wrangler/
+
+# Local agent handoff / scratch docs (never tracked)
+.claude/
+
+# TanStack Router generated temp dir
+.tanstack/
