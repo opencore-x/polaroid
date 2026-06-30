@@ -1,5 +1,5 @@
 import { type ReactNode, useState } from "react";
-import { Minus, Plus } from "lucide-react";
+import { FileDown, Minus, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -335,8 +335,9 @@ export function OptionsPanel() {
       <Button
         disabled={isExporting || photos.length === 0}
         onClick={() => void handleExport()}
-        className="w-full"
+        className="w-full gap-2"
       >
+        <FileDown className="size-4" />
         {isExporting ? "Preparing…" : "Export PDF"}
       </Button>
     </div>
