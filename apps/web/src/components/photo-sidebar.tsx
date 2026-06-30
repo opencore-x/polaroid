@@ -42,14 +42,16 @@ export function PhotoSidebar() {
       <PhotoStrip />
 
       {hasPhotos && (
-        <Button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          className="mt-auto w-full gap-2"
-        >
-          <ImagePlus className="size-4" />
-          Add photos
-        </Button>
+        <div className="mt-auto pt-2 lg:sticky lg:bottom-4">
+          <Button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            className="w-full gap-2 shadow-sm"
+          >
+            <ImagePlus className="size-4" />
+            Add photos
+          </Button>
+        </div>
       )}
 
       {dragging && (
