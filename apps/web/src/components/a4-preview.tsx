@@ -92,11 +92,8 @@ export function A4Preview() {
           ? stripPages.map((stripPhotos, page) => (
               <div
                 key={`strip-${stripPhotos[0]?.id ?? page}`}
-                className="flex flex-col gap-1"
+                className="relative"
               >
-                <span className="text-muted-foreground text-xs">
-                  {pageLabel(page)}
-                </span>
                 <StripPage
                   photos={stripPhotos}
                   width={width}
@@ -107,22 +104,18 @@ export function A4Preview() {
                   showCutMarks={showCutMarks}
                   editable
                 />
+                {pageLabel(page) && (
+                  <div className="absolute top-2 left-2">
+                    <PageBadge label={pageLabel(page)} />
+                  </div>
+                )}
               </div>
             ))
           : gridPages.map((slice, page) => (
               <div
                 key={`page-${slice.photos[0]?.id ?? page}`}
-                className="flex flex-col gap-1"
+                className="relative"
               >
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground text-xs">
-                    {pageLabel(page)}
-                  </span>
-                  <PageShapeToggle
-                    value={slice.shape}
-                    onChange={(shape) => setPageShape(page, shape)}
-                  />
-                </div>
                 <SheetPage
                   photos={slice.photos}
                   width={width}
@@ -138,10 +131,29 @@ export function A4Preview() {
                   showCameraLine={showCameraLine}
                   editable
                 />
+                {/* Screen-only controls float over the sheet's top margin so the
+                    sheet's top edge stays level with both sidebars. */}
+                <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-2">
+                  {pageLabel(page) ? <PageBadge label={pageLabel(page)} /> : <span />}
+                  <div className="pointer-events-auto rounded-md bg-background/80 p-0.5 shadow-sm ring-1 ring-border backdrop-blur-sm">
+                    <PageShapeToggle
+                      value={slice.shape}
+                      onChange={(shape) => setPageShape(page, shape)}
+                    />
+                  </div>
+                </div>
               </div>
             ))}
       </div>
     </section>
+  );
+}
+
+function PageBadge({ label }: { label: string }) {
+  return (
+    <span className="text-muted-foreground bg-background/80 ring-border pointer-events-auto rounded-md px-1.5 py-0.5 text-xs shadow-sm ring-1 backdrop-blur-sm">
+      {label}
+    </span>
   );
 }
 
