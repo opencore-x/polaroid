@@ -15,7 +15,9 @@ function Home() {
     <main className="mx-auto flex min-h-svh w-full max-w-7xl flex-col gap-5 p-4 sm:p-6">
       <header className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-semibold tracking-tight">Polaroid</h1>
+          <h1 className="font-display text-3xl font-semibold tracking-tight [font-variation-settings:'opsz'_144]">
+            Polaroid
+          </h1>
           <p className="text-muted-foreground text-sm">
             Edit each frame on the page — everything stays on your device.
           </p>
