@@ -135,7 +135,7 @@ export function A4Preview() {
                     sheet's top edge stays level with both sidebars. */}
                 <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-2">
                   {pageLabel(page) ? <PageBadge label={pageLabel(page)} /> : <span />}
-                  <div className="pointer-events-auto rounded-md bg-background/80 p-0.5 shadow-sm ring-1 ring-border backdrop-blur-sm">
+                  <div className="pointer-events-auto rounded-lg bg-white/40 p-0.5 ring-1 ring-black/5 backdrop-blur-md">
                     <PageShapeToggle
                       value={slice.shape}
                       onChange={(shape) => setPageShape(page, shape)}
@@ -151,7 +151,7 @@ export function A4Preview() {
 
 function PageBadge({ label }: { label: string }) {
   return (
-    <span className="text-muted-foreground bg-background/80 ring-border pointer-events-auto rounded-md px-1.5 py-0.5 text-xs shadow-sm ring-1 backdrop-blur-sm">
+    <span className="pointer-events-auto rounded-md bg-white/40 px-1.5 py-0.5 text-xs text-neutral-500 ring-1 ring-black/5 backdrop-blur-md">
       {label}
     </span>
   );
@@ -178,11 +178,11 @@ function PageShapeToggle({
                 aria-pressed={active}
                 onClick={() => onChange(id)}
                 className={cn(
-                  "text-muted-foreground hover:bg-accent hover:text-foreground flex size-6 items-center justify-center rounded",
-                  active && "bg-accent text-foreground",
+                  "flex size-5 items-center justify-center rounded text-neutral-500 transition-colors hover:bg-black/5 hover:text-neutral-900",
+                  active && "bg-black/10 text-neutral-900",
                 )}
               >
-                <Icon className="size-3.5" />
+                <Icon className="size-3" />
               </button>
             </TooltipTrigger>
             <TooltipContent>{label} frames on this page</TooltipContent>
