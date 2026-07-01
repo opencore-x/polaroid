@@ -1,8 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { A4Preview } from '@/components/a4-preview'
-import { AddPhotosFab } from '@/components/add-photos-fab'
-import { MobileOptions } from '@/components/mobile-options'
+import { MobileBottomBar } from '@/components/mobile-bottom-bar'
 import { OptionsPanel } from '@/components/options-panel'
 import { PhotoFilmstrip } from '@/components/photo-filmstrip'
 import { PhotoSidebar } from '@/components/photo-sidebar'
@@ -20,19 +19,19 @@ function Home() {
 
   return (
     <main className="mx-auto flex min-h-svh w-full max-w-7xl flex-col gap-5 p-4 sm:p-6">
-      <header className="flex items-start justify-between gap-3">
-        <div className="flex flex-col gap-1">
+      <header className="flex flex-col gap-1">
+        <div className="flex items-start justify-between gap-3">
           <h1 className="font-display text-3xl font-semibold tracking-tight [font-variation-settings:'opsz'_144]">
-            Polaroid
+            Polaroid<span className="text-primary">.</span>
           </h1>
-          <p className="text-muted-foreground text-sm">
-            Edit each frame on the page — everything stays on your device.
-          </p>
+          <div className="flex items-start gap-2">
+            <ThemeToggle />
+            <ProjectControls />
+          </div>
         </div>
-        <div className="flex items-start gap-2">
-          <ThemeToggle />
-          <ProjectControls />
-        </div>
+        <p className="text-muted-foreground text-sm">
+          Edit each frame on the page — everything stays on your device.
+        </p>
       </header>
 
       {hasPhotos && <PhotoFilmstrip className="lg:hidden" />}
@@ -55,8 +54,9 @@ function Home() {
         </aside>
       </div>
 
-      {hasPhotos && <AddPhotosFab className="lg:hidden" />}
-      <MobileOptions />
+      {/* Clears the fixed mobile bottom bar so nothing hides behind it. */}
+      <div aria-hidden className="h-20 shrink-0 lg:hidden" />
+      <MobileBottomBar />
     </main>
   )
 }

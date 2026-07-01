@@ -1,4 +1,4 @@
-import { type ComponentType, type ReactNode, useState } from "react";
+import { type ComponentType, type ReactNode } from "react";
 import {
   FileDown,
   Minus,
@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useExportPdf } from "@/hooks/use-export-pdf";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -31,9 +32,7 @@ import {
   paperSize,
 } from "@/lib/layout";
 import { paginate } from "@/lib/pages";
-import { downloadSheetPdf, downloadStripPdf } from "@/lib/pdf";
 import { SHEET_PRESETS, type SheetPreset } from "@/lib/presets";
-import { paginateStrips } from "@/lib/strip";
 import { cn } from "@/lib/utils";
 
 const SHAPE_ICONS: Record<Orientation, ComponentType<{ className?: string }>> = {
@@ -98,7 +97,7 @@ export function OptionsPanel({ bare = false }: { bare?: boolean } = {}) {
 
   const applyPreset = useSettingsStore((state) => state.applyPreset);
 
-  const [isExporting, setIsExporting] = useState(false);
+  const { exportPdf, isExporting, pageCount } = useExportPdf();
   const paper = paperSize(paperSizeId);
 
   // When pages carry different shapes the dropdown reads "Mixed"; picking a
@@ -116,10 +115,6 @@ export function OptionsPanel({ bare = false }: { bare?: boolean } = {}) {
     ? pages[0].shape
     : null;
 
-  const pageCount =
-    sheetFormat === "strip"
-      ? paginateStrips(photos, stripsPerRow, paper, borderWidth).length
-      : pages.length;
   const framesPerPage = perRow * rows;
 
   const selectLocation = (value: CaptionLocation) => {
@@ -129,39 +124,6 @@ export function OptionsPanel({ bare = false }: { bare?: boolean } = {}) {
   const selectDate = (value: DateFormat) => {
     setDateFormat(value);
     applyDateFormat(value);
-  };
-
-  const handleExport = async () => {
-    setIsExporting(true);
-    try {
-      if (sheetFormat === "strip") {
-        await downloadStripPdf(
-          photos,
-          stripsPerRow,
-          showCutMarks,
-          paper,
-          borderColor,
-          borderWidth,
-        );
-      } else {
-        await downloadSheetPdf(
-          photos,
-          perRow,
-          rows,
-          showCutMarks,
-          showCaptions,
-          showCameraLine,
-          paper,
-          frameShape,
-          pageShapes,
-          borderColor,
-          borderWidth,
-          captionFontId,
-        );
-      }
-    } finally {
-      setIsExporting(false);
-    }
   };
 
   return (
@@ -366,21 +328,23 @@ export function OptionsPanel({ bare = false }: { bare?: boolean } = {}) {
         />
       </Section>
 
-      <Button
-        disabled={isExporting || photos.length === 0}
-        onClick={() => void handleExport()}
-        className="h-auto w-full flex-col gap-0.5 py-2"
-      >
-        <span className="flex items-center gap-2">
-          <FileDown className="size-4" />
-          {isExporting ? "Preparing…" : "Export PDF"}
-        </span>
-        {!isExporting && photos.length > 0 && (
-          <span className="text-xs font-normal opacity-80">
-            {pageCount} {pageCount === 1 ? "page" : "pages"} · {paper.label}
+      {!bare && (
+        <Button
+          disabled={isExporting || photos.length === 0}
+          onClick={() => void exportPdf()}
+          className="h-auto w-full flex-col gap-0.5 py-2"
+        >
+          <span className="flex items-center gap-2">
+            <FileDown className="size-4" />
+            {isExporting ? "Preparing…" : "Export PDF"}
           </span>
-        )}
-      </Button>
+          {!isExporting && photos.length > 0 && (
+            <span className="text-xs font-normal opacity-80">
+              {pageCount} {pageCount === 1 ? "page" : "pages"} · {paper.label}
+            </span>
+          )}
+        </Button>
+      )}
     </div>
   );
 }

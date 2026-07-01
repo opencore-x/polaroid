@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Download, Upload } from 'lucide-react'
+import { FolderOpen, Save } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -68,7 +68,7 @@ export function ProjectControls() {
               disabled={busy}
               onClick={() => inputRef.current?.click()}
             >
-              <Upload className="size-4" />
+              <FolderOpen className="size-4" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>Open project</TooltipContent>
@@ -83,7 +83,7 @@ export function ProjectControls() {
               disabled={busy || photos.length === 0}
               onClick={() => void handleSave()}
             >
-              <Download className="size-4" />
+              <Save className="size-4" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>Save project</TooltipContent>
