@@ -86,7 +86,7 @@ export function A4Preview() {
       </div>
       <div
         ref={setContainer}
-        className="mx-auto flex w-full max-w-xl flex-col gap-5"
+        className="mx-auto flex w-full max-w-xl flex-col gap-8"
       >
         {sheetFormat === "strip"
           ? stripPages.map((stripPhotos, page) => (
@@ -105,8 +105,10 @@ export function A4Preview() {
                   editable
                 />
                 {pageLabel(page) && (
-                  <div className="absolute top-0 left-3 z-10 -translate-y-1/2">
-                    <PageBadge label={pageLabel(page)} />
+                  <div className="absolute inset-x-1 top-0 z-10 -mt-4 flex -translate-y-1/2 items-center">
+                    <span className="text-muted-foreground text-xs font-medium">
+                      {pageLabel(page)}
+                    </span>
                   </div>
                 )}
               </div>
@@ -131,15 +133,13 @@ export function A4Preview() {
                   showCameraLine={showCameraLine}
                   editable
                 />
-                {pageLabel(page) && (
-                  <div className="absolute top-0 left-3 z-10 -translate-y-1/2">
-                    <PageBadge label={pageLabel(page)} />
-                  </div>
-                )}
-                {/* Straddles the sheet's top edge (≈half above it) so the per-page
-                    frame-shape control is always reachable — including on touch,
-                    where there's no hover to reveal it. */}
-                <div className="absolute top-0 right-3 z-10 -translate-y-1/2">
+                {/* Page number + frame-shape control sit just above the sheet,
+                    out of the page, so the sheet's top edge stays aligned with
+                    the side columns while these float above that line. */}
+                <div className="absolute inset-x-1 top-0 z-10 -mt-4 flex -translate-y-1/2 items-center justify-between gap-2">
+                  <span className="text-muted-foreground text-xs font-medium">
+                    {pageLabel(page)}
+                  </span>
                   <PageShapeToggle
                     value={slice.shape}
                     onChange={(shape) => setPageShape(page, shape)}
@@ -152,14 +152,6 @@ export function A4Preview() {
   );
 }
 
-function PageBadge({ label }: { label: string }) {
-  return (
-    <span className="pointer-events-auto rounded-lg bg-white/70 px-2 py-1 text-xs text-neutral-500 shadow-sm ring-1 ring-black/5 backdrop-blur-md dark:bg-neutral-800/80 dark:text-neutral-300 dark:ring-white/10">
-      {label}
-    </span>
-  );
-}
-
 /** Always-visible glassy segmented control for this page's frame shape. */
 function PageShapeToggle({
   value,
@@ -169,7 +161,7 @@ function PageShapeToggle({
   onChange: (shape: Orientation) => void;
 }) {
   return (
-    <div className="flex gap-0.5 rounded-lg bg-white/70 p-0.5 shadow-sm ring-1 ring-black/5 backdrop-blur-md dark:bg-neutral-800/80 dark:ring-white/10">
+    <div className="flex gap-0.5 rounded-full bg-white/20 p-0.5 ring-1 ring-black/5 backdrop-blur-md dark:bg-neutral-900/30 dark:ring-white/10">
       {FRAME_SHAPES.map(({ id, label }) => {
         const Icon = SHAPE_ICONS[id];
         const active = value === id;
@@ -182,12 +174,11 @@ function PageShapeToggle({
                 aria-pressed={active}
                 onClick={() => onChange(id)}
                 className={cn(
-                  "flex size-6 items-center justify-center rounded text-neutral-500 transition-colors hover:bg-black/5 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-white/10 dark:hover:text-neutral-100",
-                  active &&
-                    "bg-black/10 text-neutral-900 dark:bg-white/15 dark:text-neutral-100",
+                  "flex size-5 items-center justify-center rounded-full text-neutral-900 transition-colors hover:bg-black/5 dark:text-neutral-100 dark:hover:bg-white/10",
+                  active && "bg-black/[0.08] dark:bg-white/10",
                 )}
               >
-                <Icon className="size-3.5" />
+                <Icon className="size-3" />
               </button>
             </TooltipTrigger>
             <TooltipContent>{label} frames on this page</TooltipContent>

@@ -36,7 +36,7 @@ function Home() {
 
       {hasPhotos && <PhotoFilmstrip className="lg:hidden" />}
 
-      <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)_300px] lg:items-start">
+      <div className="mt-4 grid gap-6 lg:mt-8 lg:grid-cols-[240px_minmax(0,1fr)_300px] lg:items-start">
         <aside
           className={cn(
             'hidden lg:flex lg:flex-col lg:self-stretch',
