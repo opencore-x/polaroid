@@ -3,17 +3,17 @@ import { type CSSProperties } from 'react'
 import { CroppedImage } from '@/components/cropped-image'
 import { captionColors } from '@/lib/color'
 import { type Orientation, orientationAspect } from '@/lib/crop'
-import { POLAROID, cardAspect } from '@/lib/layout'
+import { CARD, cardAspect } from '@/lib/layout'
 import { type Photo } from '@/lib/photos'
 import { cn } from '@/lib/utils'
 import { usePhotoStore } from '@/stores/photo-store'
 
 /**
- * A polaroid sized proportionally to `width` (px) so it matches the exported
+ * A card sized proportionally to `width` (px) so it matches the exported
  * PDF. On the editor sheet it's interactive: click to select, then drag/zoom the
  * photo and edit captions right on the frame.
  */
-export function SheetPolaroid({
+export function SheetCard({
   photo,
   width,
   shape,
@@ -96,7 +96,7 @@ export function SheetPolaroid({
               placeholder="Add caption"
               onChange={(value) => setCaption(photo.id, 'captionTop', value)}
               style={{
-                fontSize: width * POLAROID.captionTopSize,
+                fontSize: width * CARD.captionTopSize,
                 lineHeight: 1.1,
                 color: ink.top,
               }}
@@ -107,7 +107,7 @@ export function SheetPolaroid({
               placeholder="Date"
               onChange={(value) => setCaption(photo.id, 'captionBottom', value)}
               style={{
-                fontSize: width * POLAROID.captionBottomSize,
+                fontSize: width * CARD.captionBottomSize,
                 lineHeight: 1.1,
                 color: ink.bottom,
               }}
@@ -146,7 +146,7 @@ function CaptionLine({
         type="text"
         value={value}
         placeholder={placeholder}
-        aria-label="Polaroid caption"
+        aria-label="Card caption"
         onClick={(event) => event.stopPropagation()}
         onChange={(event) => onChange(event.target.value)}
         className="w-full bg-transparent text-center placeholder:text-neutral-300 focus:outline-none"

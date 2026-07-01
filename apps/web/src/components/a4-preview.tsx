@@ -37,7 +37,7 @@ export function A4Preview() {
   const setPageShape = useSettingsStore((state) => state.setPageShape);
   const borderColor = useSettingsStore((state) => state.borderColor);
   const borderWidth = useSettingsStore((state) => state.borderWidth);
-  const perRow = useSettingsStore((state) => state.polaroidsPerRow);
+  const perRow = useSettingsStore((state) => state.cardsPerRow);
   const rows = useSettingsStore((state) => state.rowsPerPage);
   const showCutMarks = useSettingsStore((state) => state.showCutMarks);
   const showCaptions = useSettingsStore((state) => state.showCaptions);

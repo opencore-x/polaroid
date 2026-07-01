@@ -1,10 +1,10 @@
-import { SheetPolaroid } from '@/components/sheet-polaroid'
+import { SheetCard } from '@/components/sheet-card'
 import { type Orientation } from '@/lib/crop'
 import { type PaperSize, cropMarks, sheetLayout } from '@/lib/layout'
 import { type Photo } from '@/lib/photos'
 import { useEditorStore } from '@/stores/editor-store'
 
-/** One print sheet: margin guide, positioned polaroids, and crop marks. */
+/** One print sheet: margin guide, positioned cards, and crop marks. */
 export function SheetPage({
   photos,
   width,
@@ -68,7 +68,7 @@ export function SheetPage({
                 zIndex: editable && selectedId === photo.id ? 10 : undefined,
               }}
             >
-              <SheetPolaroid
+              <SheetCard
                 photo={photo}
                 width={rect.width * mmToPx}
                 shape={shape}

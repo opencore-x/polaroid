@@ -21,7 +21,7 @@ const formatters: Record<DateFormat, Intl.DateTimeFormat> = {
   year: new Intl.DateTimeFormat(undefined, { year: 'numeric' }),
 }
 
-/** Formats a capture date for a polaroid caption, e.g. "October 2008". */
+/** Formats a capture date for a card caption, e.g. "October 2008". */
 export function formatCaptionDate(
   date: Date,
   format: DateFormat = DEFAULT_DATE_FORMAT,

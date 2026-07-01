@@ -4,7 +4,7 @@
 
 ## Context
 
-Polaroid captions auto-fill the city from a photo's EXIF GPS (#4). Resolving
+Rewind Card captions auto-fill the city from a photo's EXIF GPS (#4). Resolving
 GPS → city name can be done two ways:
 
 - **Online API** (Nominatim, Google, etc.) — accurate, but sends every photo's

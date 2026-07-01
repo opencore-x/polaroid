@@ -1,4 +1,4 @@
-// How a photo is framed inside its polaroid window. The same math drives the
+// How a photo is framed inside its card window. The same math drives the
 // on-screen preview (as CSS percentages) and the PDF rasterizer (as source
 // pixels), so what you position is exactly what prints.
 
@@ -15,7 +15,7 @@ export const DEFAULT_CROP: Crop = { x: 0.5, y: 0.5, scale: 1 }
 export const MIN_CROP_SCALE = 1
 export const MAX_CROP_SCALE = 4
 
-/** Shape of the photo window inside the (uniform) polaroid card. */
+/** Shape of the photo window inside the (uniform) card card. */
 export type Orientation = 'square' | 'portrait' | 'landscape'
 export const ORIENTATIONS: Orientation[] = ['square', 'portrait', 'landscape']
 export const DEFAULT_ORIENTATION: Orientation = 'square'

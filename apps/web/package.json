@@ -1,5 +1,5 @@
 {
-  "name": "@polaroid/web",
+  "name": "@rewind/web",
   "private": true,
   "type": "module",
   "scripts": {

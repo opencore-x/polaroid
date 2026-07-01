@@ -28,9 +28,9 @@ export function paperSize(id: string): PaperSize {
   return PAPER_SIZES.find((paper) => paper.id === id) ?? PAPER_SIZES[0]
 }
 
-// Polaroid proportions, expressed as ratios of the polaroid's width so the same
+// Card proportions, expressed as ratios of the card's width so the same
 // numbers drive the on-screen preview (px) and the exported PDF (pt).
-export const POLAROID = {
+export const CARD = {
   captionBand: 0.25, // thicker bottom band that holds the captions
   captionTopSize: 0.1, // city line font size
   captionBottomSize: 0.075, // date line font size
@@ -71,7 +71,7 @@ export function cardAspect(
   shape: Orientation,
   border = DEFAULT_BORDER_WIDTH,
 ): number {
-  return border + (1 - border * 2) / orientationAspect(shape) + POLAROID.captionBand
+  return border + (1 - border * 2) / orientationAspect(shape) + CARD.captionBand
 }
 
 export interface Rect {
@@ -89,7 +89,7 @@ export interface Segment {
 }
 
 /**
- * L-shaped trim ticks at each corner of a polaroid, offset outward by `gap` so
+ * L-shaped trim ticks at each corner of a card, offset outward by `gap` so
  * the marks point at the cut corners without inking the trim line itself.
  */
 export function cropMarks(r: Rect, len = 2.5, gap = 1): Segment[] {
@@ -112,13 +112,13 @@ export function cropMarks(r: Rect, len = 2.5, gap = 1): Segment[] {
 export interface SheetLayout {
   perRow: number
   rows: number
-  /** Max polaroids that fit on one sheet. */
+  /** Max cards that fit on one sheet. */
   capacity: number
   cellWidthMm: number
   cellHeightMm: number
   marginMm: number
   gapMm: number
-  /** Top-left position + size (mm) of the polaroid at `index` on the sheet. */
+  /** Top-left position + size (mm) of the card at `index` on the sheet. */
   rectFor: (index: number) => Rect
 }
 

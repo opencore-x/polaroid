@@ -4,7 +4,7 @@ import { type Photo } from '@/lib/photos'
 // Photo-booth strip geometry. A strip is a tall card holding four square photos
 // stacked in a column with a thin border between them and a wider footer band
 // to write on. The same crop math drives the on-screen preview and the PDF, so
-// what you frame is what prints — exactly like the polaroid grid.
+// what you frame is what prints — exactly like the card grid.
 
 export const PHOTOS_PER_STRIP = 4
 
