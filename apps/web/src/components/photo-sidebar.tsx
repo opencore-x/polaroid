@@ -1,13 +1,12 @@
-import { useCallback, useRef } from 'react'
+import { useCallback } from 'react'
 import { ImagePlus } from 'lucide-react'
 
 import { PhotoStrip } from '@/components/photo-strip'
 import { Button } from '@/components/ui/button'
+import { useAddPhotos } from '@/hooks/use-add-photos'
 import { useWindowFileDrop } from '@/hooks/use-window-file-drop'
+import { PHOTO_ACCEPT } from '@/lib/upload'
 import { usePhotoStore } from '@/stores/photo-store'
-
-const ACCEPT =
-  'image/jpeg,image/png,image/webp,image/heic,image/heif,.jpg,.jpeg,.png,.webp,.heic,.heif'
 
 /**
  * Left rail: the reorderable photo strip, with an "Add photos" button pinned
@@ -19,7 +18,7 @@ const ACCEPT =
 export function PhotoSidebar() {
   const addFiles = usePhotoStore((state) => state.addFiles)
   const hasPhotos = usePhotoStore((state) => state.photos.length > 0)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const { inputRef, open, onChange } = useAddPhotos()
 
   const onFiles = useCallback((files: File[]) => addFiles(files), [addFiles])
   const dragging = useWindowFileDrop(onFiles)
@@ -29,14 +28,10 @@ export function PhotoSidebar() {
       <input
         ref={inputRef}
         type="file"
-        accept={ACCEPT}
+        accept={PHOTO_ACCEPT}
         multiple
         hidden
-        onChange={(event) => {
-          const files = Array.from(event.target.files ?? [])
-          if (files.length > 0) addFiles(files)
-          event.target.value = ''
-        }}
+        onChange={onChange}
       />
 
       <PhotoStrip />
@@ -45,7 +40,7 @@ export function PhotoSidebar() {
         <div className="mt-auto pt-2 lg:sticky lg:bottom-4">
           <Button
             type="button"
-            onClick={() => inputRef.current?.click()}
+            onClick={open}
             className="w-full gap-2 shadow-sm"
           >
             <ImagePlus className="size-4" />
