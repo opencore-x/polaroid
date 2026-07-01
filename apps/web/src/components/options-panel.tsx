@@ -54,8 +54,10 @@ import {
   useSettingsStore,
 } from "@/stores/settings-store";
 
-/** The right-hand rail: every caption + sheet option, plus export. */
-export function OptionsPanel() {
+/** Every caption + sheet option, plus export. Rendered in the desktop right
+ *  rail and, on mobile, inside the options drawer (pass `bare` there — the
+ *  drawer supplies its own surface). */
+export function OptionsPanel({ bare = false }: { bare?: boolean } = {}) {
   const photos = usePhotoStore((state) => state.photos);
   const applyLocationMode = usePhotoStore((state) => state.applyLocationMode);
   const applyDateFormat = usePhotoStore((state) => state.applyDateFormat);
@@ -163,7 +165,12 @@ export function OptionsPanel() {
   };
 
   return (
-    <div className="border-input bg-card flex flex-col gap-5 rounded-lg border p-3">
+    <div
+      className={cn(
+        "flex flex-col gap-5",
+        !bare && "border-input bg-card rounded-lg border p-3",
+      )}
+    >
       <Presets onApply={applyPreset} />
 
       {sheetFormat === "grid" && (

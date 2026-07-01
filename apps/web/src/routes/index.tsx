@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { A4Preview } from '@/components/a4-preview'
 import { AddPhotosFab } from '@/components/add-photos-fab'
+import { MobileOptions } from '@/components/mobile-options'
 import { OptionsPanel } from '@/components/options-panel'
 import { PhotoFilmstrip } from '@/components/photo-filmstrip'
 import { PhotoSidebar } from '@/components/photo-sidebar'
@@ -49,12 +50,13 @@ function Home() {
         <div className="min-w-0">
           <A4Preview />
         </div>
-        <aside className="lg:sticky lg:top-4">
+        <aside className="hidden lg:sticky lg:top-4 lg:block">
           <OptionsPanel />
         </aside>
       </div>
 
       {hasPhotos && <AddPhotosFab className="lg:hidden" />}
+      <MobileOptions />
     </main>
   )
 }
