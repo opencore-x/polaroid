@@ -23,7 +23,7 @@ export function AddPhotosFab({ className }: { className?: string }) {
         onClick={open}
         aria-label="Add photos"
         className={cn(
-          "bg-primary text-primary-foreground fixed right-4 bottom-4 z-40 flex size-14 items-center justify-center rounded-full shadow-lg transition-transform active:scale-95",
+          "bg-primary text-primary-foreground ring-background fixed right-4 bottom-4 z-40 flex size-14 items-center justify-center rounded-full shadow-2xl ring-2 transition-transform active:scale-95",
           className,
         )}
       >
