@@ -115,6 +115,8 @@ interface SettingsState {
   /** Whether captions are shown at all. */
   showCaptions: boolean
   setShowCaptions: (show: boolean) => void
+  /** Apply a preset's settings in one shot, clearing per-page shape overrides. */
+  applyPreset: (settings: Partial<SettingsSnapshot>) => void
 }
 
 export const useSettingsStore = create<SettingsState>((set) => ({
@@ -154,4 +156,5 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   setShowCameraLine: (show) => set({ showCameraLine: show }),
   showCaptions: true,
   setShowCaptions: (show) => set({ showCaptions: show }),
+  applyPreset: (settings) => set({ ...settings, pageShapes: [] }),
 }))
