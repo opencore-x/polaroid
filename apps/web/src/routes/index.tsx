@@ -29,7 +29,7 @@ function Home() {
       </header>
 
       <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)_300px] lg:items-start">
-        <aside className="flex flex-col lg:self-stretch">
+        <aside className="flex flex-col lg:self-stretch lg:rounded-lg lg:bg-black/[0.03] lg:p-3 lg:dark:bg-white/[0.04]">
           <PhotoSidebar />
         </aside>
         <div className="min-w-0">
