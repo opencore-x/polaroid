@@ -81,7 +81,7 @@ export function A4Preview() {
   return (
     <section className="flex flex-col gap-3">
       {/* Pinned to the screen, so the selected frame's tools never shift the page. */}
-      <div className="pointer-events-none fixed inset-x-0 bottom-4 z-30 flex justify-center px-4">
+      <div className="pointer-events-none fixed inset-x-0 bottom-24 z-30 flex justify-center px-4 lg:bottom-4">
         <SheetInspector />
       </div>
       <div
@@ -105,7 +105,7 @@ export function A4Preview() {
                   editable
                 />
                 {pageLabel(page) && (
-                  <div className="absolute top-2 left-2">
+                  <div className="absolute top-0 left-3 z-10 -translate-y-1/2">
                     <PageBadge label={pageLabel(page)} />
                   </div>
                 )}
@@ -131,16 +131,19 @@ export function A4Preview() {
                   showCameraLine={showCameraLine}
                   editable
                 />
-                {/* Screen-only controls float over the sheet's top margin so the
-                    sheet's top edge stays level with both sidebars. */}
-                <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-1">
-                  {pageLabel(page) ? <PageBadge label={pageLabel(page)} /> : <span />}
-                  <div className="pointer-events-auto">
-                    <PageShapeToggle
-                      value={slice.shape}
-                      onChange={(shape) => setPageShape(page, shape)}
-                    />
+                {pageLabel(page) && (
+                  <div className="absolute top-0 left-3 z-10 -translate-y-1/2">
+                    <PageBadge label={pageLabel(page)} />
                   </div>
+                )}
+                {/* Straddles the sheet's top edge (≈half above it) so the per-page
+                    frame-shape control is always reachable — including on touch,
+                    where there's no hover to reveal it. */}
+                <div className="absolute top-0 right-3 z-10 -translate-y-1/2">
+                  <PageShapeToggle
+                    value={slice.shape}
+                    onChange={(shape) => setPageShape(page, shape)}
+                  />
                 </div>
               </div>
             ))}
@@ -151,17 +154,13 @@ export function A4Preview() {
 
 function PageBadge({ label }: { label: string }) {
   return (
-    <span className="pointer-events-auto rounded-md bg-white/40 px-1.5 py-0.5 text-xs text-neutral-500 ring-1 ring-black/5 backdrop-blur-md">
+    <span className="pointer-events-auto rounded-lg bg-white/70 px-2 py-1 text-xs text-neutral-500 shadow-sm ring-1 ring-black/5 backdrop-blur-md dark:bg-neutral-800/80 dark:text-neutral-300 dark:ring-white/10">
       {label}
     </span>
   );
 }
 
-/**
- * Collapses to a single glassy icon of the current shape so it stays out of the
- * way of the sheet's margin guide; reveals the full selector on hover or focus
- * (focus covers touch, where there's no hover).
- */
+/** Always-visible glassy segmented control for this page's frame shape. */
 function PageShapeToggle({
   value,
   onChange,
@@ -169,51 +168,32 @@ function PageShapeToggle({
   value: Orientation;
   onChange: (shape: Orientation) => void;
 }) {
-  const CurrentIcon = SHAPE_ICONS[value];
-  const glass =
-    "rounded-md bg-white/40 ring-1 ring-black/5 backdrop-blur-md";
   return (
-    <div className="group/shape relative flex justify-end">
-      <button
-        type="button"
-        aria-label="Change page frame shape"
-        className={cn(
-          "flex size-5 items-center justify-center text-neutral-500 transition-opacity group-hover/shape:pointer-events-none group-hover/shape:opacity-0 group-focus-within/shape:pointer-events-none group-focus-within/shape:opacity-0",
-          glass,
-        )}
-      >
-        <CurrentIcon className="size-3" />
-      </button>
-      <div
-        className={cn(
-          "pointer-events-none absolute top-0 right-0 flex gap-0.5 p-0.5 opacity-0 transition-opacity group-hover/shape:pointer-events-auto group-hover/shape:opacity-100 group-focus-within/shape:pointer-events-auto group-focus-within/shape:opacity-100",
-          glass,
-        )}
-      >
-        {FRAME_SHAPES.map(({ id, label }) => {
-          const Icon = SHAPE_ICONS[id];
-          const active = value === id;
-          return (
-            <Tooltip key={id}>
-              <TooltipTrigger asChild>
-                <button
-                  type="button"
-                  aria-label={`${label} frames on this page`}
-                  aria-pressed={active}
-                  onClick={() => onChange(id)}
-                  className={cn(
-                    "flex size-5 items-center justify-center rounded text-neutral-500 transition-colors hover:bg-black/5 hover:text-neutral-900",
-                    active && "bg-black/10 text-neutral-900",
-                  )}
-                >
-                  <Icon className="size-3" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>{label} frames on this page</TooltipContent>
-            </Tooltip>
-          );
-        })}
-      </div>
+    <div className="flex gap-0.5 rounded-lg bg-white/70 p-0.5 shadow-sm ring-1 ring-black/5 backdrop-blur-md dark:bg-neutral-800/80 dark:ring-white/10">
+      {FRAME_SHAPES.map(({ id, label }) => {
+        const Icon = SHAPE_ICONS[id];
+        const active = value === id;
+        return (
+          <Tooltip key={id}>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                aria-label={`${label} frames on this page`}
+                aria-pressed={active}
+                onClick={() => onChange(id)}
+                className={cn(
+                  "flex size-6 items-center justify-center rounded text-neutral-500 transition-colors hover:bg-black/5 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-white/10 dark:hover:text-neutral-100",
+                  active &&
+                    "bg-black/10 text-neutral-900 dark:bg-white/15 dark:text-neutral-100",
+                )}
+              >
+                <Icon className="size-3.5" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>{label} frames on this page</TooltipContent>
+          </Tooltip>
+        );
+      })}
     </div>
   );
 }
