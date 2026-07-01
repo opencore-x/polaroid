@@ -1,5 +1,12 @@
-import { type ReactNode, useState } from "react";
-import { FileDown, Minus, Plus } from "lucide-react";
+import { type ComponentType, type ReactNode, useState } from "react";
+import {
+  FileDown,
+  Minus,
+  Plus,
+  RectangleHorizontal,
+  RectangleVertical,
+  Square,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -10,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SegmentedControl } from "@/components/ui/segmented-control";
 import { Switch } from "@/components/ui/switch";
 import { type Orientation } from "@/lib/crop";
 import { DATE_FORMATS, type DateFormat } from "@/lib/date";
@@ -24,7 +32,15 @@ import {
 } from "@/lib/layout";
 import { paginate } from "@/lib/pages";
 import { downloadSheetPdf, downloadStripPdf } from "@/lib/pdf";
+import { SHEET_PRESETS, type SheetPreset } from "@/lib/presets";
+import { paginateStrips } from "@/lib/strip";
 import { cn } from "@/lib/utils";
+
+const SHAPE_ICONS: Record<Orientation, ComponentType<{ className?: string }>> = {
+  square: Square,
+  portrait: RectangleVertical,
+  landscape: RectangleHorizontal,
+};
 import { usePhotoStore } from "@/stores/photo-store";
 import {
   type CaptionLocation,
@@ -78,6 +94,8 @@ export function OptionsPanel() {
   const showCutMarks = useSettingsStore((state) => state.showCutMarks);
   const setShowCutMarks = useSettingsStore((state) => state.setShowCutMarks);
 
+  const applyPreset = useSettingsStore((state) => state.applyPreset);
+
   const [isExporting, setIsExporting] = useState(false);
   const paper = paperSize(paperSizeId);
 
@@ -95,6 +113,12 @@ export function OptionsPanel() {
   const uniformShape = pages.every((p) => p.shape === pages[0].shape)
     ? pages[0].shape
     : null;
+
+  const pageCount =
+    sheetFormat === "strip"
+      ? paginateStrips(photos, stripsPerRow, paper, borderWidth).length
+      : pages.length;
+  const framesPerPage = perRow * rows;
 
   const selectLocation = (value: CaptionLocation) => {
     setCaptionLocation(value);
@@ -140,96 +164,98 @@ export function OptionsPanel() {
 
   return (
     <div className="border-input bg-card flex flex-col gap-5 rounded-lg border p-3">
+      <Presets onApply={applyPreset} />
+
       {sheetFormat === "grid" && (
         <Section title="Captions">
-          <Field label="Location" htmlFor="opt-location">
-            <FieldSelect
-              id="opt-location"
-              value={captionLocation}
-              onChange={(value) => selectLocation(value as CaptionLocation)}
-            >
-              {LOCATION_DETAILS.map((detail) => (
-                <SelectItem key={detail.id} value={detail.id}>
-                  {detail.label}
-                </SelectItem>
-              ))}
-              <SelectItem value="neighborhood" disabled>
-                Neighborhood (offline N/A)
-              </SelectItem>
-            </FieldSelect>
-          </Field>
-          <Field label="Date" htmlFor="opt-date">
-            <FieldSelect
-              id="opt-date"
-              value={dateFormat}
-              onChange={(value) => selectDate(value as DateFormat)}
-            >
-              {DATE_FORMATS.map((format) => (
-                <SelectItem key={format.id} value={format.id}>
-                  {format.label}
-                </SelectItem>
-              ))}
-            </FieldSelect>
-          </Field>
-          <Field label="Font" htmlFor="opt-font">
-            <FieldSelect
-              id="opt-font"
-              value={captionFontId}
-              onChange={setCaptionFont}
-            >
-              {CAPTION_FONTS.map((font) => (
-                <SelectItem
-                  key={font.id}
-                  value={font.id}
-                  style={{ fontFamily: font.stack }}
-                >
-                  {font.label}
-                </SelectItem>
-              ))}
-            </FieldSelect>
-          </Field>
-          <SettingSwitch
-            label="Camera info"
-            checked={showCameraLine}
-            onChange={setShowCameraLine}
-          />
           <SettingSwitch
             label="Captions"
             checked={showCaptions}
             onChange={setShowCaptions}
           />
+          {showCaptions && (
+            <>
+              <Field label="Location" htmlFor="opt-location">
+                <FieldSelect
+                  id="opt-location"
+                  value={captionLocation}
+                  onChange={(value) => selectLocation(value as CaptionLocation)}
+                >
+                  {LOCATION_DETAILS.map((detail) => (
+                    <SelectItem key={detail.id} value={detail.id}>
+                      {detail.label}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value="neighborhood" disabled>
+                    Neighborhood (offline N/A)
+                  </SelectItem>
+                </FieldSelect>
+              </Field>
+              <Field label="Date" htmlFor="opt-date">
+                <FieldSelect
+                  id="opt-date"
+                  value={dateFormat}
+                  onChange={(value) => selectDate(value as DateFormat)}
+                >
+                  {DATE_FORMATS.map((format) => (
+                    <SelectItem key={format.id} value={format.id}>
+                      {format.label}
+                    </SelectItem>
+                  ))}
+                </FieldSelect>
+              </Field>
+              <Field label="Font" htmlFor="opt-font">
+                <FieldSelect
+                  id="opt-font"
+                  value={captionFontId}
+                  onChange={setCaptionFont}
+                >
+                  {CAPTION_FONTS.map((font) => (
+                    <SelectItem
+                      key={font.id}
+                      value={font.id}
+                      style={{ fontFamily: font.stack }}
+                    >
+                      {font.label}
+                    </SelectItem>
+                  ))}
+                </FieldSelect>
+              </Field>
+              <SettingSwitch
+                label="Camera info"
+                checked={showCameraLine}
+                onChange={setShowCameraLine}
+              />
+            </>
+          )}
         </Section>
       )}
 
       <Section title="Sheet">
-        <Field label="Format" htmlFor="opt-format">
-          <FieldSelect
-            id="opt-format"
+        <Field label="Format">
+          <SegmentedControl
+            ariaLabel="Sheet format"
             value={sheetFormat}
             onChange={(value) => setSheetFormat(value as SheetFormat)}
-          >
-            <SelectItem value="grid">Grid</SelectItem>
-            <SelectItem value="strip">Photostrip</SelectItem>
-          </FieldSelect>
+            options={[
+              { value: "grid", label: "Grid" },
+              { value: "strip", label: "Photostrip" },
+            ]}
+          />
         </Field>
         {sheetFormat === "grid" && (
-          <Field label="Frame" htmlFor="opt-shape">
-            <FieldSelect
-              id="opt-shape"
-              value={uniformShape ?? "mixed"}
+          <Field label="Frame">
+            <SegmentedControl
+              ariaLabel="Frame shape"
+              iconOnly
+              value={uniformShape}
               onChange={(value) => setFrameShapeAll(value as Orientation)}
-            >
-              {!uniformShape && (
-                <SelectItem value="mixed" disabled>
-                  Mixed
-                </SelectItem>
-              )}
-              {FRAME_SHAPES.map((option) => (
-                <SelectItem key={option.id} value={option.id}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </FieldSelect>
+              options={FRAME_SHAPES.map((option) => ({
+                value: option.id,
+                label: option.label,
+                icon: SHAPE_ICONS[option.id],
+              }))}
+            />
           </Field>
         )}
         <Field label="Border" htmlFor="opt-border">
@@ -267,18 +293,16 @@ export function OptionsPanel() {
             </label>
           </span>
         </Field>
-        <Field label="Thickness" htmlFor="opt-thickness">
-          <FieldSelect
-            id="opt-thickness"
+        <Field label="Thickness">
+          <SegmentedControl
+            ariaLabel="Border thickness"
             value={String(borderWidth)}
             onChange={(value) => setBorderWidth(Number(value))}
-          >
-            {BORDER_WIDTHS.map((option) => (
-              <SelectItem key={option.label} value={String(option.ratio)}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </FieldSelect>
+            options={BORDER_WIDTHS.map((option) => ({
+              value: String(option.ratio),
+              label: option.label,
+            }))}
+          />
         </Field>
         <Field label="Paper" htmlFor="opt-paper">
           <FieldSelect
@@ -313,6 +337,9 @@ export function OptionsPanel() {
                 onChange={setRows}
               />
             </Field>
+            <p className="text-muted-foreground text-right text-xs">
+              {framesPerPage} frames per page
+            </p>
           </>
         ) : (
           <Field label="Strips" htmlFor="opt-strips">
@@ -335,11 +362,46 @@ export function OptionsPanel() {
       <Button
         disabled={isExporting || photos.length === 0}
         onClick={() => void handleExport()}
-        className="w-full gap-2"
+        className="h-auto w-full flex-col gap-0.5 py-2"
       >
-        <FileDown className="size-4" />
-        {isExporting ? "Preparing…" : "Export PDF"}
+        <span className="flex items-center gap-2">
+          <FileDown className="size-4" />
+          {isExporting ? "Preparing…" : "Export PDF"}
+        </span>
+        {!isExporting && photos.length > 0 && (
+          <span className="text-xs font-normal opacity-80">
+            {pageCount} {pageCount === 1 ? "page" : "pages"} · {paper.label}
+          </span>
+        )}
       </Button>
+    </div>
+  );
+}
+
+function Presets({
+  onApply,
+}: {
+  onApply: (settings: SheetPreset["settings"]) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-2.5">
+      <h3 className="text-muted-foreground text-[11px] font-semibold tracking-wide uppercase">
+        Quick start
+      </h3>
+      <div className="grid grid-cols-2 gap-1.5">
+        {SHEET_PRESETS.map((preset) => (
+          <Button
+            key={preset.id}
+            type="button"
+            variant="outline"
+            size="sm"
+            className="h-8"
+            onClick={() => onApply(preset.settings)}
+          >
+            {preset.label}
+          </Button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -424,14 +486,18 @@ function Field({
   children,
 }: {
   label: string;
-  htmlFor: string;
+  htmlFor?: string;
   children: ReactNode;
 }) {
   return (
     <div className="flex items-center justify-between gap-2">
-      <Label htmlFor={htmlFor} className="text-sm font-normal">
-        {label}
-      </Label>
+      {htmlFor ? (
+        <Label htmlFor={htmlFor} className="text-sm font-normal">
+          {label}
+        </Label>
+      ) : (
+        <span className="text-sm">{label}</span>
+      )}
       {children}
     </div>
   );
