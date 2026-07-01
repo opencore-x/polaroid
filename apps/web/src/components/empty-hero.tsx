@@ -1,11 +1,8 @@
-import { useRef } from "react";
 import { ImagePlus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { usePhotoStore } from "@/stores/photo-store";
-
-const ACCEPT =
-  "image/jpeg,image/png,image/webp,image/heic,image/heif,.jpg,.jpeg,.png,.webp,.heic,.heif";
+import { useAddPhotos } from "@/hooks/use-add-photos";
+import { PHOTO_ACCEPT } from "@/lib/upload";
 
 /** A few illustrative polaroids — pure CSS, no image assets, so it loads instantly. */
 const SAMPLES = [
@@ -16,8 +13,7 @@ const SAMPLES = [
 
 /** Shown in the centre column before any photos are added. */
 export function EmptyHero() {
-  const addFiles = usePhotoStore((state) => state.addFiles);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const { inputRef, open, onChange } = useAddPhotos();
 
   return (
     <div className="flex min-h-[60svh] flex-col items-center justify-center gap-9 px-4 text-center">
@@ -56,21 +52,12 @@ export function EmptyHero() {
         <input
           ref={inputRef}
           type="file"
-          accept={ACCEPT}
+          accept={PHOTO_ACCEPT}
           multiple
           hidden
-          onChange={(event) => {
-            const files = Array.from(event.target.files ?? []);
-            if (files.length > 0) addFiles(files);
-            event.target.value = "";
-          }}
+          onChange={onChange}
         />
-        <Button
-          type="button"
-          size="lg"
-          className="gap-2"
-          onClick={() => inputRef.current?.click()}
-        >
+        <Button type="button" size="lg" className="gap-2" onClick={open}>
           <ImagePlus className="size-4" />
           Add photos
         </Button>
