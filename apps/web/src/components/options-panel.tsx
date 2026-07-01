@@ -86,8 +86,8 @@ export function OptionsPanel({ bare = false }: { bare?: boolean } = {}) {
   const setBorderWidth = useSettingsStore((state) => state.setBorderWidth);
   const sheetFormat = useSettingsStore((state) => state.sheetFormat);
   const setSheetFormat = useSettingsStore((state) => state.setSheetFormat);
-  const perRow = useSettingsStore((state) => state.polaroidsPerRow);
-  const setPerRow = useSettingsStore((state) => state.setPolaroidsPerRow);
+  const perRow = useSettingsStore((state) => state.cardsPerRow);
+  const setPerRow = useSettingsStore((state) => state.setCardsPerRow);
   const rows = useSettingsStore((state) => state.rowsPerPage);
   const setRows = useSettingsStore((state) => state.setRowsPerPage);
   const stripsPerRow = useSettingsStore((state) => state.stripsPerRow);

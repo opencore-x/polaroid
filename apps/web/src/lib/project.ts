@@ -66,7 +66,7 @@ export async function buildProjectFile(
 export async function downloadProject(
   photos: Photo[],
   settings: SettingsSnapshot,
-  filename = 'polaroid-project.json',
+  filename = 'rewind-project.json',
 ): Promise<void> {
   const project = await buildProjectFile(photos, settings)
   const blob = new Blob([JSON.stringify(project)], { type: 'application/json' })

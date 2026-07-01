@@ -22,7 +22,7 @@ function Home() {
       <header className="flex flex-col gap-1">
         <div className="flex items-start justify-between gap-3">
           <h1 className="font-display text-3xl font-semibold tracking-tight [font-variation-settings:'opsz'_144]">
-            Polaroid<span className="text-primary">.</span>
+            Rewind<span className="text-primary">.</span>
           </h1>
           <div className="flex items-start gap-2">
             <ThemeToggle />

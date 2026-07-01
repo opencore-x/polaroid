@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "polaroid",
+  "name": "rewind",
   "compatibility_date": "2026-06-01",
   "account_id": "0329049a192c522c4e6ec9f38653bf00",
   "assets": {
@@ -8,5 +8,5 @@
     "not_found_handling": "single-page-application"
   },
   "workers_dev": true,
-  "routes": [{ "pattern": "polaroid.opencore.in", "custom_domain": true }]
+  "routes": [{ "pattern": "rewind.opencore.in", "custom_domain": true }]
 }

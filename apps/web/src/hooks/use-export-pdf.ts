@@ -16,7 +16,7 @@ export function useExportPdf() {
   const photos = usePhotoStore((state) => state.photos);
   const sheetFormat = useSettingsStore((state) => state.sheetFormat);
   const paperSizeId = useSettingsStore((state) => state.paperSizeId);
-  const perRow = useSettingsStore((state) => state.polaroidsPerRow);
+  const perRow = useSettingsStore((state) => state.cardsPerRow);
   const rows = useSettingsStore((state) => state.rowsPerPage);
   const stripsPerRow = useSettingsStore((state) => state.stripsPerRow);
   const borderWidth = useSettingsStore((state) => state.borderWidth);
@@ -49,7 +49,7 @@ export function useExportPdf() {
       } else {
         await downloadSheetPdf(
           photos,
-          s.polaroidsPerRow,
+          s.cardsPerRow,
           s.rowsPerPage,
           s.showCutMarks,
           s.showCaptions,

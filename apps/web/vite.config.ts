@@ -14,10 +14,10 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'icon.svg'],
       manifest: {
-        name: 'Polaroid — print-at-home photo frames',
-        short_name: 'Polaroid',
+        name: 'Rewind — print-at-home photo frames',
+        short_name: 'Rewind',
         description:
-          'Turn your photos into polaroid-style print sheets, ready for home or lab. Everything stays on your device.',
+          'Turn your photos into Rewind Cards on print-ready sheets, for home or lab. Everything stays on your device.',
         theme_color: '#0a0a0a',
         background_color: '#0a0a0a',
         display: 'standalone',

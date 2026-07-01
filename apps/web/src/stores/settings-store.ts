@@ -17,7 +17,7 @@ export const MAX_ROWS = 6
 export const MIN_STRIPS_PER_ROW = 2
 export const MAX_STRIPS_PER_ROW = 5
 
-/** Sheet layout format: the polaroid grid or photo-booth strips. */
+/** Sheet layout format: the card grid or photo-booth strips. */
 export type SheetFormat = 'grid' | 'strip'
 
 export type CaptionLocation = LocationDetail
@@ -31,7 +31,7 @@ export interface SettingsSnapshot {
   pageShapes: Orientation[]
   captionFontId: string
   paperSizeId: string
-  polaroidsPerRow: number
+  cardsPerRow: number
   rowsPerPage: number
   stripsPerRow: number
   showCutMarks: boolean
@@ -57,7 +57,7 @@ export const PERSISTED_SETTINGS_KEYS: (keyof SettingsSnapshot)[] = [
   'pageShapes',
   'captionFontId',
   'paperSizeId',
-  'polaroidsPerRow',
+  'cardsPerRow',
   'rowsPerPage',
   'stripsPerRow',
   'showCutMarks',
@@ -68,10 +68,10 @@ export const PERSISTED_SETTINGS_KEYS: (keyof SettingsSnapshot)[] = [
 ]
 
 interface SettingsState {
-  /** Sheet layout format: the polaroid grid or photo-booth strips. */
+  /** Sheet layout format: the card grid or photo-booth strips. */
   sheetFormat: SheetFormat
   setSheetFormat: (format: SheetFormat) => void
-  /** Polaroid border colour (hex) — the card the photo sits on. */
+  /** Card border colour (hex) — the card the photo sits on. */
   borderColor: string
   setBorderColor: (hex: string) => void
   /** Border thickness as a fraction of the frame width (sides/top). */
@@ -91,9 +91,9 @@ interface SettingsState {
   /** Selected print stock (A4, Letter, 4×6, …). */
   paperSizeId: string
   setPaperSize: (id: string) => void
-  /** Polaroids per row on the sheet (grid columns). */
-  polaroidsPerRow: number
-  setPolaroidsPerRow: (count: number) => void
+  /** Cards per row on the sheet (grid columns). */
+  cardsPerRow: number
+  setCardsPerRow: (count: number) => void
   /** Grid rows per page; combined with perRow this fixes the frames per sheet. */
   rowsPerPage: number
   setRowsPerPage: (count: number) => void
@@ -140,8 +140,8 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   setCaptionFont: (id) => set({ captionFontId: id }),
   paperSizeId: DEFAULT_PAPER_SIZE_ID,
   setPaperSize: (id) => set({ paperSizeId: id }),
-  polaroidsPerRow: 3,
-  setPolaroidsPerRow: (count) => set({ polaroidsPerRow: count }),
+  cardsPerRow: 3,
+  setCardsPerRow: (count) => set({ cardsPerRow: count }),
   rowsPerPage: 3,
   setRowsPerPage: (count) => set({ rowsPerPage: count }),
   stripsPerRow: 3,

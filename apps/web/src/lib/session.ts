@@ -11,7 +11,7 @@ import { type SettingsSnapshot } from '@/stores/settings-store'
 // settings live in IndexedDB so a refresh or accidental tab close doesn't wipe
 // the working set. Nothing ever leaves the device.
 
-const DB_NAME = 'polaroid'
+const DB_NAME = 'rewind'
 const DB_VERSION = 1
 const BLOBS = 'blobs' // key: photo id -> File
 const META = 'meta' // key: photo id -> PhotoMeta

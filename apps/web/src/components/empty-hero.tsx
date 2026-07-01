@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAddPhotos } from "@/hooks/use-add-photos";
 import { PHOTO_ACCEPT } from "@/lib/upload";
 
-/** A few illustrative polaroids — pure CSS, no image assets, so it loads instantly. */
+/** A few illustrative Rewind Cards — pure CSS, no image assets, so it loads instantly. */
 const SAMPLES = [
   { tint: "linear-gradient(150deg, #f7c59f, #ee6c4d)", caption: "Lisbon · '24", rotate: -6 },
   { tint: "linear-gradient(150deg, #bcd4e6, #3d5a80)", caption: "Sunday market", rotate: 3 },
@@ -40,7 +40,7 @@ export function EmptyHero() {
 
       <div className="flex max-w-md flex-col items-center gap-3">
         <h2 className="font-display text-3xl leading-tight tracking-tight [font-variation-settings:'opsz'_144] sm:text-4xl">
-          Turn your photos into polaroids
+          Turn your photos into Rewind Cards
         </h2>
         <p className="text-muted-foreground text-sm leading-relaxed sm:text-base">
           Drop in a few shots — captions fill themselves in from each photo's

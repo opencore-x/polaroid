@@ -4,7 +4,7 @@ import { captionColors, hexToRgb01 } from '@/lib/color'
 import { type Crop, type Orientation, cropSource, orientationAspect } from '@/lib/crop'
 import {
   type PaperSize,
-  POLAROID,
+  CARD,
   PT_PER_MM,
   cropMarks,
   sheetLayout,
@@ -167,8 +167,8 @@ export async function buildSheetPdf(
       }
 
       const cx = x + w / 2
-      const topSize = w * POLAROID.captionTopSize
-      const botSize = w * POLAROID.captionBottomSize
+      const topSize = w * CARD.captionTopSize
+      const botSize = w * CARD.captionBottomSize
       const capY = pageH - yTop - pad - imgH - pad * 0.6
       if (showCaptions && photo.captionTop) {
         page.drawText(photo.captionTop, {
@@ -311,7 +311,7 @@ export async function downloadSheetPdf(
   borderColor: string,
   borderWidth: number,
   captionFontId: string,
-  filename = 'polaroids.pdf',
+  filename = 'rewind-cards.pdf',
 ): Promise<void> {
   const bytes = await buildSheetPdf(
     photos,
